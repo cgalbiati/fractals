@@ -1,54 +1,130 @@
 'use strict';
-// function draw(ctx, seq, key){
 
-// }
+let numHits = 0;
 
-function drawLine(ctx, [startX, startY, endX, endY], color){
-  console.log('hi', startX, startY, endX, endY)
-  if (!color, color = 'blue');
-  ctx.beginPath();
-  ctx.strokeStyle = color;
-  ctx.moveTo(startX, startY);
-  ctx.lineTo(endX, endY);
-  ctx.stroke();
+const WALKER_COLOR = 'rgb(30,30,30)';
+const WALKER_COL_ARR = [20,30,40];
+const BR_COLOR = [0,0,0];
+let BLOB_COLOR = [0,255,0];
+const WALKER_WIDTH = 8;
+let blobWidth = 1;
+let blob_growth = .5;
+const NUM_WALKERS = 5;
+const MAX_ITERATIONS = 500000;
+const MAX_HITS = 800;
+
+//transforms color arr to rgb/rgba str
+function toRGB(colorArr){
+  //color is rgb val
+  let startStr = 'rgb(';
+  if(colorArr.length === 4) startStr = 'rgba(';
+  let colorStr = colorArr.reduce(function(built, cur) {
+      return built + cur.toString() + ',';
+    }, startStr);
+  colorStr = colorStr.slice(0, colorStr.length-1) + ')'
+  console.log(colorStr)
+  return colorStr;
 }
 
-
-
-// generate endX and endY for a given colision direction and length
-function genLine(oldX, oldY, nX, nY, lenMult){
-  let eX = nX - (nX - oldX) * lenMult;
-  let eY = nY - (nY - oldY) * lenMult;
-  return [nX, nY, eX, eY];
+function changeColor(){
+  if(BLOB_COLOR[2]<251) BLOB_COLOR[2]+=4;
+  else if (BLOB_COLOR[1] > 4) BLOB_COLOR[1]-=4;
+  else if (BLOB_COLOR[0]< 251) BLOB_COLOR[0]+=4;
 }
 
-function walk(ctx, oldPos, iteration, max){
-  let newPos = movePos(oldPos);
+//choose positions of seeds
+function plantSeeds(ctx, data){
+  let color = toRGB(BLOB_COLOR);
+  var seeds = genSeeds(data);
+  seeds.forEach(function(seedPos){
+    // console.log('seed', seedPos)
+    ctx.beginPath();
+    ctx.arc(seedPos[0], seedPos[1], 2, 0, 360);
+    ctx.fillStyle = color
+    ctx.fill();
+  })
+  
+}
 
-  //get land pixel
-  let color = ctx.getImageData(newPos[0], newPos[1], 1, 1).data.slice(0,3);
-  //if not black
+function genSeeds(data){
+  return [[getWidth()/2, getHeight()/2]];
+}
 
-  if(color[0]!==0 || color[1]!==0 || color[2]!==0) {
-    //draw growth
-    drawLine(ctx, genLine(oldPos[0], oldPos[1], newPos[0], newPos[1], 3));
-    newPos = [Math.floor(Math.random() * window.innerWidth), Math.floor(Math.random() * window.innerHeight) ]
-    console.log('intersect', newPos)
+//determines if a point is inside the image bounds
+function testBounds(){
+ return true
+}
+
+//tests if each pixel is part of blob and returns pixel num || -1
+function compColorArea(colorsArr, testingArr, errorMargin){
+  // console.log('comparing', colorsArr, testingArr)
+  for(let i = 0; i<testingArr.length; i+=4){
+    for(let j = 0; j<colorsArr.length; j++){
+      //if color at that spot is higher than walker color and not alpha value
+      if(j !== 3 && testingArr[i+j] > colorsArr[j] + errorMargin) {
+        //test to make sure alpha val is not skewing numbers
+        // console.log('found intersect', i, j, testingArr[i+j], testingArr[j], testingArr[i+3], testingArr)
+        let alpha = testingArr[i+3];
+        //returns n where matching pixel is nth in testing arr
+        if(alpha > 100) return Math.floor(i/4);
+      }
+    }
   }
-  // if(iteration<max) walk(ctx, newPos, iteration+1, max)
-  // drawLine(ctx, [oldPos[0], oldPos[1], newPos[0], newPos[1]]);
-  setTimeout(function(){
+  return -1;
+}
 
-  if(iteration<max) walk(ctx, newPos, iteration+1, max)
-  else console.log('done')
-  }, .00001)
-  //get color
-  //if color not black or white, part of growth - draw
+function walkRecurse(ctx, oldPos, maxIterations, iteration, maxHits, runOpt){
+  // console.log('old', oldPos)
+  let newPos = movePos(oldPos);
+  // console.log('newPos', newPos)
+  //get land pixel
+  let flooredPos = [Math.floor(newPos[0]), Math.floor(newPos[1])];
+  let color = getColorArea(ctx, newPos, WALKER_WIDTH);
+  // console.log('color', color, newPos)
+
+  // reliably tests if point is on blob
+  // if((color[0]>WALKER_COL_ARR[0]+20 || color[1]>WALKER_COL_ARR[1]+20 || color[2]>WALKER_COL_ARR[2]+20) && color[3]>50) {
+  let collisionPixel = compColorArea(WALKER_COL_ARR, color, 20);
+  if (collisionPixel>-1){
+    //find position of colision pixel
+    let pixelPos = [ Math.floor(newPos[0]-WALKER_WIDTH/2) + collisionPixel % WALKER_WIDTH, Math.floor(newPos[1]-WALKER_WIDTH/2) + Math.floor(collisionPixel / WALKER_WIDTH) ];
+
+    //draw growth
+    drawLine(ctx, genLine(oldPos[0], oldPos[1], pixelPos[0], pixelPos[1], blob_growth), toRGB(BLOB_COLOR), blobWidth);
+    numHits ++;
+    changeColor();
+    //corner respawn
+    newPos = pickCorner(Math.floor(Math.random()*6), getWidth(), getHeight());
+    // random respawn
+    // newPos = [Math.floor(Math.random() * window.innerWidth), Math.floor(Math.random() * window.innerHeight) ]
+    // console.log('intersect', numHits, newPos, color)
+  } else {
+    //draw walker (only if no colision to aviod drawing over)
+    // drawLine(ctx, [oldPos[0], oldPos[1], newPos[0], newPos[1]], WALKER_COLOR, WALKER_WIDTH);
+  
+  }
+  
+  if(runOpt === 'frame'){
+    //runs only when visible
+    if (iteration < maxIterations && numHits < maxHits) {
+      window.requestAnimationFrame(walkRecurse.bind(null, ctx, newPos, maxIterations, iteration+1, maxHits));
+    } else console.log('done')
+  }
+
+  else {
+    //runs all the time
+    setTimeout(function(){
+      if (iteration < maxIterations && numHits < maxHits) { 
+        walkRecurse(ctx, newPos, maxIterations, iteration+1, maxHits);
+      } else console.log('done', maxHits, numHits, iteration)
+    }, .000000000001);
+  }
+
 }
 
 function movePos ([x,y]){
-  let xChange = (Math.random()-.5)*5;
-  let yChange = (Math.random()-.5)*5;
+  let xChange = (Math.random()-.5)*10;
+  let yChange = (Math.random()-.5)*10;
   // console.log(xChange, yChange)
 
   //bounce
@@ -73,81 +149,56 @@ function movePos ([x,y]){
 // }
 
 
-function init (canvas, data){
-  if(canvas){
-    canvas.width = window.innerWidth;
-    canvas.height = window.innerHeight;
-    let ctx = canvas.getContext("2d");
-    ctx.lineWidth=3;
-
-    return ctx;
-
-  } else throw new Error('Could not get canvas');
-}
-
-function getWidth(){
-  return window.innerWidth;
-}
-function getHeight(){
-  return window.innerHeight;
-}
-
 let data = 22;
 
 document.addEventListener("DOMContentLoaded", function(event) { 
   let canvas = document.getElementById('canvas');
   let ctx = init(canvas, data);
 
-  // drawLine(ctx, [30, 40, 30, 90], 'red');
-  // drawLine(ctx, genLine(100,100,20,20,1));
+  plantSeeds(ctx, data);
+
+  
+  //start walkers
+  // startWalkers(ctx, walkIt, 1, 1000)
+  startWalkers(ctx, walkRecurse, NUM_WALKERS, MAX_ITERATIONS, MAX_HITS);
 
 
-  ctx.beginPath();
-  ctx.arc(getWidth()/2, getHeight()/2, 20, 0, 360);
-  ctx.fillStyle = 'red'
-  ctx.fill();
-  // ctx.beginPath();
-  // ctx.arc(100, 50, 20, 0, 360);
-  // ctx.stroke();
-  // ctx.beginPath();
-  // ctx.arc(200, 100, 20, 0, 360);
-  // ctx.stroke();
-  // ctx.beginPath();
-  // ctx.arc(200, 50, 20, 0, 360);
-  // ctx.stroke();
-  //   ctx.arc(200, 150, 20, 0, 360);
-  // ctx.stroke();
-  // ctx.beginPath();
-  // ctx.arc(300, 50, 20, 0, 360);
-  // ctx.stroke();
+});
 
-for (let i = 0; i<100; i++){
-  for (let j = 0; j<4; j++){
-    let [x,y] = calcDif(j, 50);
-    walk(ctx, [getWidth()/2+x, getHeight()/2+y], 0, 10000000);
+function startWalkers(ctx, walkFn, numWalkers, iterations, maxHits){
+  for (let i = 0; i<numWalkers; i++){
+    [0,1,2,3, 4, 5, 6, 7].forEach(function(j){
+      let [x,y] = pickCorner(j, getWidth(), getHeight());
+      // console.log('starting',j, x, y)
+      walkFn(ctx, [x, y], iterations, 0, maxHits);
+    })
   }
 }
-function calcDif(n, dif){
+
+function pickCorner(n, difX, difY){
+  // console.log(n)
   switch(n){
-    case n===0:
-      return [0-dif, 0-dif];
-    case n===1:
-      return [dif, 0-dif];
-    case n===2:
-      return [0-dif, dif];
+    case 0:
+      return [0, 0];
+    case 1:
+      return [difX/2, 0];
+    case 2:
+      return [0, difY/2];
+    case 3:
+      return [difX, 0];
+    case 4:
+      return [0, difY];
+    case 5:
+      return [difX/2, difY];
+    case 6:
+      return [difX, difY/2];
+
     default:
-      return [dif, dif];
+      return [difX, difY];
 
   }
 }
 
-});
-
-window.addEventListener('resize', function(e){
-  let canvas = document.getElementById('canvas');
-  canvas.width = window.innerWidth;
-  canvas.height = window.innerHeight;
-});
 
 //start at edge - weight away from edge
 
@@ -182,6 +233,42 @@ window.addEventListener('resize', function(e){
 
 //seed points
 //transormation
+
+
+// function walkIt(ctx, startPos, max){
+//   let newPos = startPos;
+//   console.log('newPos', newPos)
+//   let oldPos, color;
+
+//     window.requestAnimationFrame(walkerStuff)
+  
+
+//   // for(let i = 0; i<max; i++){
+//   //   oldPos = newPos.slice();
+//   //   newPos = movePos(oldPos);
+//   //   console.log('newPos', newPos)
+//   //   color = ctx.getImageData(newPos[0], newPos[1], 1, 1).data.slice(0,3);
+//   //   if(color[0]!==0 || color[1]!==0 || color[2]!==0) {
+//   //     //draw growth
+//   //     drawLine(ctx, genLine(oldPos[0], oldPos[1], newPos[0], newPos[1], 3));
+//   //     newPos = [Math.floor(Math.random() * window.innerWidth), Math.floor(Math.random() * window.innerHeight) ]
+//   //     console.log('intersect', newPos)
+//   //   }
+
+//   function walkerStuff(){
+//     oldPos = newPos.slice();
+//     newPos = movePos(oldPos);
+//     console.log('newPos', newPos)
+//     drawLine(ctx, [oldPos[0], oldPos[1], newPos[0], newPos[1]], "red")
+//     color = ctx.getImageData(newPos[0], newPos[1], 1, 1).data.slice(0,3);
+//     // if(color[0]!==0 || color[1]!==0 || color[2]!==0) {
+//     //   //draw growth
+//     //   drawLine(ctx, genLine(oldPos[0], oldPos[1], newPos[0], newPos[1], 3));
+//     //   newPos = [Math.floor(Math.random() * window.innerWidth), Math.floor(Math.random() * window.innerHeight) ]
+//     //   console.log('intersect', newPos)
+//     // }
+//   }
+// }
 
 
 
