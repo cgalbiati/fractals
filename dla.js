@@ -27,9 +27,9 @@ function toRGB(colorArr){
 }
 
 function changeColor(){
-  if(BLOB_COLOR[2]<251) BLOB_COLOR[2]+=4;
-  else if (BLOB_COLOR[1] > 4) BLOB_COLOR[1]-=4;
-  else if (BLOB_COLOR[0]< 251) BLOB_COLOR[0]+=4;
+  if(BLOB_COLOR[2] < 253 && BLOB_COLOR[0] === 0) BLOB_COLOR[2]+=2;
+  else if (BLOB_COLOR[1] > 2) BLOB_COLOR[1]-=2;
+  else if (BLOB_COLOR[0]< 253) BLOB_COLOR[0]+=2;
 }
 
 //choose positions of seeds
@@ -100,21 +100,22 @@ function walkRecurse(ctx, oldPos, maxIterations, iteration, maxHits, runOpt){
     // console.log('intersect', numHits, newPos, color)
   } else {
     //draw walker (only if no colision to aviod drawing over)
-    // drawLine(ctx, [oldPos[0], oldPos[1], newPos[0], newPos[1]], WALKER_COLOR, WALKER_WIDTH);
+    console.log(watchDraw)
+    if (watchDraw) drawLine(ctx, [oldPos[0], oldPos[1], newPos[0], newPos[1]], WALKER_COLOR, WALKER_WIDTH);
   
   }
   
   if(runOpt === 'frame'){
     //runs only when visible
-    if (iteration < maxIterations && numHits < maxHits) {
-      window.requestAnimationFrame(walkRecurse.bind(null, ctx, newPos, maxIterations, iteration+1, maxHits));
+    if (iteration < maxIterations && numHits < maxHits && contDrawing) {
+      window.requestAnimFrame(walkRecurse.bind(null, ctx, newPos, maxIterations, iteration+1, maxHits));
     } else console.log('done')
   }
 
-  else {
+  else if (iteration < maxIterations && numHits < maxHits && contDrawing) {
     //runs all the time
     setTimeout(function(){
-      if (iteration < maxIterations && numHits < maxHits) { 
+      if (iteration < maxIterations && numHits < maxHits && contDrawing) { 
         walkRecurse(ctx, newPos, maxIterations, iteration+1, maxHits);
       } else console.log('done', maxHits, numHits, iteration)
     }, .000000000001);
@@ -136,34 +137,15 @@ function movePos ([x,y]){
   return [newX, newY];
 }
 
-// function moveLeft([x, y]){
-//   let xChange = (Math.random()-.8)*2;
-//   let yChange = (Math.random()-.5) * 2;
-//   // console.log(xChange, yChange)
-
-//   //bounce
-//   let newX = (x + xChange < 0 || x + xChange >= window.innerWidth) ? x - xChange : x + xChange;
-//   let newY = (y + yChange < 0 || y + yChange >= window.innerHeight) ? y - yChange : y + yChange;
-  
-//   return [newX, newY];
-// }
 
 
-let data = 22;
-
-document.addEventListener("DOMContentLoaded", function(event) { 
-  let canvas = document.getElementById('canvas');
-  let ctx = init(canvas, data);
-
+function drawDLA(ctx, data){
   plantSeeds(ctx, data);
-
-  
   //start walkers
   // startWalkers(ctx, walkIt, 1, 1000)
   startWalkers(ctx, walkRecurse, NUM_WALKERS, MAX_ITERATIONS, MAX_HITS);
 
-
-});
+}
 
 function startWalkers(ctx, walkFn, numWalkers, iterations, maxHits){
   for (let i = 0; i<numWalkers; i++){
@@ -240,7 +222,7 @@ function pickCorner(n, difX, difY){
 //   console.log('newPos', newPos)
 //   let oldPos, color;
 
-//     window.requestAnimationFrame(walkerStuff)
+//     window.requestAnimFrame(walkerStuff)
   
 
 //   // for(let i = 0; i<max; i++){
@@ -270,6 +252,31 @@ function pickCorner(n, difX, difY){
 //   }
 // }
 
+// function moveLeft([x, y]){
+//   let xChange = (Math.random()-.8)*2;
+//   let yChange = (Math.random()-.5) * 2;
+//   // console.log(xChange, yChange)
 
+//   //bounce
+//   let newX = (x + xChange < 0 || x + xChange >= window.innerWidth) ? x - xChange : x + xChange;
+//   let newY = (y + yChange < 0 || y + yChange >= window.innerHeight) ? y - yChange : y + yChange;
+  
+//   return [newX, newY];
+// }
+
+
+// document.addEventListener("DOMContentLoaded", function(event) { 
+//   let canvas = document.getElementById('canvas');
+//   let ctx = init(canvas, data);
+
+//   plantSeeds(ctx, data);
+
+  
+//   //start walkers
+//   // startWalkers(ctx, walkIt, 1, 1000)
+//   startWalkers(ctx, walkRecurse, NUM_WALKERS, MAX_ITERATIONS, MAX_HITS);
+
+
+// });
 
 
