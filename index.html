@@ -10,10 +10,18 @@
 </head>
 <body>
   <h1 style="text-align:center;">Drawing Fractals!</h1>
-  <canvas id='canvas' style='background:black;margin-top:20pt;'>
-    Sorry, your brower does not seem to support canvas :(
-  </canvas>
-  <div style='float:right;'>
+  <div style='float:left;margin:20pt;display:inline-block;margin-top:40pt;'>
+    <canvas id='canvas' style='background:black;'>
+      Sorry, your brower does not seem to support canvas :(
+    </canvas>
+    <div> 
+      <h3 id='rendering'> Rendering... </h3>
+      <!-- <p>tree example: Iterations: 5, Angle: 25, Axiom: FX, </P>
+      <p>Rule 1: F=C0FF-[C1-F+F]+[C2+F-F],  Rule 2: X=C0FF+[C1+F]+[C3-F]</p> -->
+    </div>
+  </div>
+  
+  <div style='float:left;'>
     <div id='l-sys-thumbnails' style='float:right;'>
       <h3 style='margin-left:20pt;'>Load L-system</h3>
       <img src="images/tree.png" class='thumbnail' id='tree'>
@@ -23,7 +31,7 @@
       <!-- <img src="images/tree.png" class='thumbnail' id='curveTree'> -->
     </div>
 
-    <div style='float:right;'>
+    <div style='float:left;'>
       <h3>Set Drawing</h3>
       <form id='drawing-opts' style='float:left;'>
         <p>Fractal type:  <input type="radio" name="fractalType" value="lSystem" checked id='l-sys-select'> L-System <input type="radio" name="fractalType" value="dla" id='dla-select'> Diffusion Limited Agregation<br></p>
@@ -42,11 +50,6 @@
         <button id='stop'>Stop</button>
       </form>
     </div>
-  </div>
-  <div> 
-    <h3 id='rendering'> Rendering... </h3>
-    <!-- <p>tree example: Iterations: 5, Angle: 25, Axiom: FX, </P>
-    <p>Rule 1: F=C0FF-[C1-F+F]+[C2+F-F],  Rule 2: X=C0FF+[C1+F]+[C3-F]</p> -->
   </div>
 
 
