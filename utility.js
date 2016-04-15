@@ -113,8 +113,22 @@ function startDrawing(ctx){
       let fractalFn = parseForm(ctx);
       fractalFn();
     }), 100
-  )
-  
+  ); 
+}
+
+function populateForm(data){
+  var form = document.getElementById('drawing-opts')
+  form.axiom.value = data.axiom || 'F';
+  form.rule1.value = data.replace['1'] || '';
+  form.rule2.value = data.replace['2'] || '';
+  form.rule3.value = data.replace['3'] || '';
+  form.startPosX.value = data.startPos[0] || 200;
+  form.startPosY.value = data.startPos[1] || 200;
+  form.angle.value = data.angle || 90;
+  form.dist.value = data.dist  || 5;
+  form.startDir.value = data.startDir || 90;
+  form.iterations.value = data.iterations || 4;
+  // form.rule1.value = data.rule1;
 }
 
 //parses form and returns bound fn
@@ -169,6 +183,7 @@ function parseRule(ruleStr, rulesDict){
 document.addEventListener("DOMContentLoaded", function(event) { 
   canvas = document.getElementById('canvas');
   ctx = init(canvas);
+  let inputs = document.getElementsByClassName('l-sys-only');
 
   //register stop button
   document.getElementById('stop').addEventListener('click', function(){
@@ -183,8 +198,19 @@ document.addEventListener("DOMContentLoaded", function(event) {
     // console.log('set here false')
     setTimeout(startDrawing.bind(window, ctx), 100);
   });
+  document.getElementById('l-sys-select').addEventListener('click', function(){
+    [].forEach.call(inputs, (function(input){input.style.visibility='visible';}));
+  });
+  document.getElementById('dla-select').addEventListener('click', function(){
+    [].forEach.call(inputs, (function(input){input.style.visibility='hidden';}));
+  });
+  document.getElementById('l-sys-thumbnails').addEventListener('click', function(e){
+    let thumbId = e.target.id;
+    if(lSysData[thumbId]) populateForm(lSysData[thumbId]);
+  });
   startDrawing(ctx);
 });
+
 
 function showRender(text){
   // console.log('starting');
@@ -194,6 +220,15 @@ function hideRender(){
   // console.log('done')
   document.getElementById('rendering').innerHTML = '';
 }
+
+//set up listener on radio buttons
+
+// function showLSysInputs(){
+//   document.getElementsByClass('l-sys').addAttribute('display:relative;')
+// }
+// function hideLSysInputs(){
+//   document.getElementsByClass('l-sys').addAttribute('display:none;')
+// }
 
 //resizing window erases any drawing
 // window.addEventListener('resize', function(e){

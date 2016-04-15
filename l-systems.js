@@ -17,29 +17,82 @@ const triangles = {
 // const data = {axiom: ['-','F'], replace:{'F': ['F','+','F','-','F','-','F','+','F']}, angle:90}
 
 //tree-like thing
-const curveTree = {
-  axiom: ['F','-','X'], 
-  replace:{
-    'F': ['F','F'], 
-    'X': ['F','-','[','[','X',']','+','X',']','[','-','X','+',']','F','[','X',']','-','X']
-  }, 
-  angle:25, 
-  dist:getHeight()/50, 
-  iterations: 4,
-  startPos:[0,getHeight()]
-}
-const bushTree = {
-  axiom: ['F'], 
-  replace:{
-    'F': ['F','F','-','[','-','F','+','F','+','F',']','+','[','+','F','-','F','-','F',']'] 
-    // 'X': ['F','-','[','[','X',']','+','X',']','[','-','X','+',']','F','[','X',']','-','X']
-  }, 
-  angle:22, 
-  startDir: 270,
-  dist:getHeight()/60, 
-  iterations: 4,
-  startPos:[getWidth()/2,getHeight()]
-}
+// const curveTree = {
+//   axiom: ['F','-','X'], 
+//   replace:{
+//     'F': ['F','F'], 
+//     'X': ['F','-','[','[','X',']','+','X',']','[','-','X','+',']','F','[','X',']','-','X']
+//   }, 
+//   angle:25, 
+//   dist:getHeight()/50, 
+//   iterations: 4,
+//   startPos:[0,getHeight()]
+// }
+lSysData = {
+  truffula: {
+    axiom: ['F-X'], 
+    replace:{
+      '1': 'F=FF', 
+      '2': 'X=F-[[X]+X][-X+]F[X]-X',
+    }, 
+    angle:25, 
+    startDir: 300,
+    dist:getHeight()/80, 
+    iterations: 5,
+    startPos:[getWidth()/3,getHeight()]
+  },
+  bushTree: {
+    axiom: ['FX'], 
+    replace:{
+      '1': 'F=FF-[-F+F+F]+[+F-F-F]', 
+      '2': 'X=F-[[X]+X][-X+]F[X]-X'
+    }, 
+    angle:25, 
+    startDir: 270,
+    iterations:4,
+    dist:getHeight()/60, 
+    iterations: 4,
+    startPos:[getWidth()/2,getHeight()]
+  },
+  triangles:{
+    axiom: ['F-G-G'], 
+    replace:{
+      '1': 'F=F-G+F+G-F', 
+      '2':'G=GG'}, 
+    startPos: [getWidth()/2, 10],
+    dist: getHeight()/29,
+    angle: 120,
+    // dist:13,
+    iterations: 5,
+    startDir: 120
+  },
+  tree: {
+    axiom: ['FX'], 
+    replace:{
+      '1': 'F=C0FF-[C1-F+F]+[C2+F-F]', 
+      '2':'X=C0FF+[C1+F]+[C3-F]'}, 
+    startPos: [getWidth()/2, getHeight()],
+    dist: 7,
+    angle: 25,
+    iterations: 4,
+    startDir: 270
+
+  }
+};
+
+
+// const bushTree = {
+//   axiom: ['F'], 
+//   replace:{
+//     'F': ['F','F','-','[','-','F','+','F','+','F',']','+','[','+','F','-','F','-','F',']'] 
+//     // 'X': ['F','-','[','[','X',']','+','X',']','[','-','X','+',']','F','[','X',']','-','X']
+//   }, 
+//   angle:22, 
+//   startDir: 270,
+//   dist:getHeight()/60, 
+//   iterations: 4,
+//   startPos:[getWidth()/2,getHeight()]
+// }
 
 
 // let data = {axiom: ['+','+','F','+','F'], replace:{'F': ['F', '+', '+', 'F', 'F', '-', 'F', '+', 'F', '+', 'F', 'F','+']}}

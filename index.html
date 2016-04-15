@@ -2,6 +2,7 @@
 <html>
 <head>
   <title></title>
+  <link href='https://fonts.googleapis.com/css?family=Comfortaa' rel='stylesheet' type='text/css'>
   <link rel="stylesheet" href="styles.css">
   <script type="text/javascript" src='utility.js'></script>
    <script type="text/javascript" src='l-systems.js'></script>
@@ -9,35 +10,45 @@
 </head>
 <body>
   <h1 style="text-align:center;">Drawing Fractals!</h1>
-  <canvas id='canvas' style='background:black;'>
+  <canvas id='canvas' style='background:black;margin-top:20pt;'>
     Sorry, your brower does not seem to support canvas :(
   </canvas>
-
   <div style='float:right;'>
-    <form id='drawing-opts'>
-      <p>Fractal type:  <input type="radio" name="fractalType" value="lSystem" checked> L-System <input type="radio" name="fractalType" value="dla"> Diffusion Limited Agregation<br></p>
-      <p class='l-sys'>Axiom<input type="text" name="axiom" value='F-G-G'></p>
-      <p class='l-sys'>Angle<input type="number" name="angle" value='120'></p>
-      <p class='l-sys'>Iterations<input type="number" name="iterations" value='5'></p>
-      <p class='l-sys'>Line Length<input type="number" name="dist" value='13'></p>
-      <p class='l-sys'>Start Direction<input type="number" name="startDir" value='120'></p>
-      <p class='l-sys'>Start Position (X, Y):<input type="number" name="startPosX" value='250'> <input type="number" name="startPosY" value='20'> </p>
-      <p class='l-sys'>Rule 1<input type="text" name="rule1" value='F=F-G+F+G-F'></p>
-      <p class='l-sys'>Rule 2<input type="text" name="rule2" value='G=GG'></p>
-      <p class='l-sys'>Rule 3<input type="text" name="rule3" value=''></p>
-      <p>Change Board Size (width, height):<input type="number" name="canvasWidth" value='500'> <input type="number" name="canvasHeight" value='400'> </p>
-      <p> <input type="checkbox" name="watchDraw" checked> Watch Drawing</p>
-      <input type='button' id='start-drawing' value='Start Drawing'>
-    </form>
-    <button id='stop'>Stop</button>
+    <div id='l-sys-thumbnails' style='float:right;'>
+      <h3 style='margin-left:20pt;'>Load L-system</h3>
+      <img src="images/tree.png" class='thumbnail' id='tree'>
+      <img src="images/bush-tree.png" class='thumbnail' id='bushTree'>
+      <img src="images/triangles.png" class='thumbnail' id='triangles'>
+      <img src="images/truffula.png" class='thumbnail' id='truffula'>
+      <!-- <img src="images/tree.png" class='thumbnail' id='curveTree'> -->
+    </div>
+
+    <div style='float:right;'>
+      <h3>Set Drawing</h3>
+      <form id='drawing-opts' style='float:left;'>
+        <p>Fractal type:  <input type="radio" name="fractalType" value="lSystem" checked id='l-sys-select'> L-System <input type="radio" name="fractalType" value="dla" id='dla-select'> Diffusion Limited Agregation<br></p>
+        <p class='l-sys-only'>Axiom<input type="text" name="axiom" value='F-G-G'></p>
+        <p class='l-sys-only'>Angle<input type="number" name="angle" value='120'></p>
+        <p class='l-sys-only'>Iterations<input type="number" name="iterations" value='5'></p>
+        <p class='l-sys-only'>Line Length<input type="number" name="dist" value='13'></p>
+        <p class='l-sys-only'>Start Direction<input type="number" name="startDir" value='120'></p>
+        <p class='l-sys-only'>Start Position (X, Y):<input type="number" name="startPosX" value='250' class='short-input'> <input type="number" name="startPosY" value='20' class='short-input'> </p>
+        <p class='l-sys-only'>Rule 1<input type="text" name="rule1" value='F=F-G+F+G-F'></p>
+        <p class='l-sys-only'>Rule 2<input type="text" name="rule2" value='G=GG'></p>
+        <p class='l-sys-only'>Rule 3<input type="text" name="rule3" value=''></p>
+        <p>Change Board Size (width, height):<input type="number" name="canvasWidth" value='500' class='short-input'> <input type="number" name="canvasHeight" value='400' class='short-input'> </p>
+        <p> <input type="checkbox" name="watchDraw" checked> Watch Drawing</p>
+        <button id='start-drawing'>Start Drawing</button>
+        <button id='stop'>Stop</button>
+      </form>
+    </div>
   </div>
-  <div style="display:inline-block;"> 
+  <div> 
     <h3 id='rendering'> Rendering... </h3>
-    <p>tree example: Iterations: 5, Angle: 25, Axiom: FX, </P>
-    <p>Rule 1: F=C0FF-[C1-F+F]+[C2+F-F],  Rule 2: X=C0FF+[C1+F]+[C3-F]</p>
+    <!-- <p>tree example: Iterations: 5, Angle: 25, Axiom: FX, </P>
+    <p>Rule 1: F=C0FF-[C1-F+F]+[C2+F-F],  Rule 2: X=C0FF+[C1+F]+[C3-F]</p> -->
   </div>
-<div id='lalala' style="float:left;">
-  </div>
+
 
 </body>
 </html>

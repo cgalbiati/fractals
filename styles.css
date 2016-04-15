@@ -1,0 +1,34 @@
+.thumbnail {
+  width: 100pt;
+  height:100pt;
+  background-size: cover;
+  box-shadow: 0 0 5pt black;
+  margin: 0 20pt 20pt 20pt;
+  display: block;
+}
+
+.short-input {
+  width: 40pt;
+}
+
+form {
+  background-color: rgb(220,230,230);
+  border-radius: 5pt;
+  box-shadow: 0 0 8pt black;
+  padding: 10pt;
+}
+
+canvas {
+  box-shadow: 0 0 8pt black;
+}
+
+input {
+  padding: 2pt;
+  padding-left: 4pt;
+  border-radius: 4pt;
+  margin-left: 10pt;
+}
+
+* {
+  font-family: 'Comfortaa', serif;
+}
