@@ -122,12 +122,12 @@ function populateForm(data){
   form.rule1.value = data.replace['1'] || '';
   form.rule2.value = data.replace['2'] || '';
   form.rule3.value = data.replace['3'] || '';
-  form.startPosX.value = data.startPos[0] || 200;
-  form.startPosY.value = data.startPos[1] || 200;
-  form.angle.value = data.angle || 90;
-  form.dist.value = data.dist  || 5;
-  form.startDir.value = data.startDir || 90;
-  form.iterations.value = data.iterations || 4;
+  form.startPosX.value =  Math.round(data.startPos[0]) || 200;
+  form.startPosY.value =  Math.round(data.startPos[1]) || 200;
+  form.angle.value =  Math.round(data.angle) || 90;
+  form.dist.value =  Math.round(data.dist)  || 5;
+  form.startDir.value =  Math.round(data.startDir) || 90;
+  form.iterations.value =  Math.round(data.iterations) || 4;
   // form.rule1.value = data.rule1;
 }
 

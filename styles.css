@@ -5,6 +5,7 @@
   box-shadow: 0 0 5pt black;
   margin: 0 20pt 20pt 20pt;
   display: block;
+  cursor: pointer;
 }
 
 .short-input {

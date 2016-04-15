@@ -1,33 +1,4 @@
 
-//pos start data:
-
-//should be triangle
-const triangles = {
-  axiom: ['F','-','G','-','G'], 
-  replace:{
-    'F': ['F','-','G','+','F','+','G','-','F'], 
-    'G':['G','G']}, 
-  startPos: [getWidth()/2 - getHeight()/2, getHeight()-10],
-  dist: getHeight()/29,
-  angle:120
-}
-
-// const data = {axiom: ['F','X'], replace:{'F': ['X','+','Y','F','+'], Y: ['-','F','X','-','Y']}, angle:90}
-
-// const data = {axiom: ['-','F'], replace:{'F': ['F','+','F','-','F','-','F','+','F']}, angle:90}
-
-//tree-like thing
-// const curveTree = {
-//   axiom: ['F','-','X'], 
-//   replace:{
-//     'F': ['F','F'], 
-//     'X': ['F','-','[','[','X',']','+','X',']','[','-','X','+',']','F','[','X',']','-','X']
-//   }, 
-//   angle:25, 
-//   dist:getHeight()/50, 
-//   iterations: 4,
-//   startPos:[0,getHeight()]
-// }
 lSysData = {
   truffula: {
     axiom: ['F-X'], 
@@ -62,7 +33,6 @@ lSysData = {
     startPos: [getWidth()/2, 10],
     dist: getHeight()/29,
     angle: 120,
-    // dist:13,
     iterations: 5,
     startDir: 120
   },
@@ -70,7 +40,8 @@ lSysData = {
     axiom: ['FX'], 
     replace:{
       '1': 'F=C0FF-[C1-F+F]+[C2+F-F]', 
-      '2':'X=C0FF+[C1+F]+[C3-F]'}, 
+      '2': 'X=C0FF+[C1+F]+[C3-F]'
+    }, 
     startPos: [getWidth()/2, getHeight()],
     dist: 7,
     angle: 25,
@@ -79,30 +50,6 @@ lSysData = {
 
   }
 };
-
-
-// const bushTree = {
-//   axiom: ['F'], 
-//   replace:{
-//     'F': ['F','F','-','[','-','F','+','F','+','F',']','+','[','+','F','-','F','-','F',']'] 
-//     // 'X': ['F','-','[','[','X',']','+','X',']','[','-','X','+',']','F','[','X',']','-','X']
-//   }, 
-//   angle:22, 
-//   startDir: 270,
-//   dist:getHeight()/60, 
-//   iterations: 4,
-//   startPos:[getWidth()/2,getHeight()]
-// }
-
-
-// let data = {axiom: ['+','+','F','+','F'], replace:{'F': ['F', '+', '+', 'F', 'F', '-', 'F', '+', 'F', '+', 'F', 'F','+']}}
-// let data = {axiom: ['+','+','+','+','+','F'], replace:{'F': ['F','F','-','[','-','F','+','F','+','F',']','+','[','+','F','-','F','-','F',']']}}
-// let data = {axiom: ['F','+','+', 'F','+','+','F',], replace:{'F': ['F','-','F','+','+','F','-','F']}}
-//should be tree
-// let data = {axiom: ['X'], replace:{'F': ['F','F'], 'X': ['F','-','[','[','X',']','+','X',']','+','F','[','+','F','X',']','-','X']}}
-
-
-let data = triangles;
 
 //currState: {
   //curPos: [x,y]
@@ -237,6 +184,55 @@ function drawLSys(ctx, data){
   }
 }
 
+//pos start data:
+
+//should be triangle
+const triangles = {
+  axiom: ['F','-','G','-','G'], 
+  replace:{
+    'F': ['F','-','G','+','F','+','G','-','F'], 
+    'G':['G','G']}, 
+  startPos: [getWidth()/2 - getHeight()/2, getHeight()-10],
+  dist: getHeight()/29,
+  angle:120
+}
+
+// const data = {axiom: ['F','X'], replace:{'F': ['X','+','Y','F','+'], Y: ['-','F','X','-','Y']}, angle:90}
+
+// const data = {axiom: ['-','F'], replace:{'F': ['F','+','F','-','F','-','F','+','F']}, angle:90}
+
+//tree-like thing
+// const curveTree = {
+//   axiom: ['F','-','X'], 
+//   replace:{
+//     'F': ['F','F'], 
+//     'X': ['F','-','[','[','X',']','+','X',']','[','-','X','+',']','F','[','X',']','-','X']
+//   }, 
+//   angle:25, 
+//   dist:getHeight()/50, 
+//   iterations: 4,
+//   startPos:[0,getHeight()]
+// }
+
+// const bushTree = {
+//   axiom: ['F'], 
+//   replace:{
+//     'F': ['F','F','-','[','-','F','+','F','+','F',']','+','[','+','F','-','F','-','F',']'] 
+//     // 'X': ['F','-','[','[','X',']','+','X',']','[','-','X','+',']','F','[','X',']','-','X']
+//   }, 
+//   angle:22, 
+//   startDir: 270,
+//   dist:getHeight()/60, 
+//   iterations: 4,
+//   startPos:[getWidth()/2,getHeight()]
+// }
+
+
+// let data = {axiom: ['+','+','F','+','F'], replace:{'F': ['F', '+', '+', 'F', 'F', '-', 'F', '+', 'F', '+', 'F', 'F','+']}}
+// let data = {axiom: ['+','+','+','+','+','F'], replace:{'F': ['F','F','-','[','-','F','+','F','+','F',']','+','[','+','F','-','F','-','F',']']}}
+// let data = {axiom: ['F','+','+', 'F','+','+','F',], replace:{'F': ['F','-','F','+','+','F','-','F']}}
+//should be tree
+// let data = {axiom: ['X'], replace:{'F': ['F','F'], 'X': ['F','-','[','[','X',']','+','X',']','+','F','[','+','F','X',']','-','X']}}
 
 
 
