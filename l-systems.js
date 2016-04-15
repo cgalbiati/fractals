@@ -70,7 +70,8 @@ function parseInstrIt(ctx, currState, dist=20, angle=25){
     case 'G':
       [newX, newY] = genLineFromAngle(curX, curY, currState.curDir, dist);
       // console.log('draw', curX, curY, newX, newY, currState.curDir);
-      drawLine(ctx, [curX, curY, newX, newY]);
+      drawLine(ctx, [curX, curY, newX, newY], toRGB(blobColor));
+      changeColor();
       return Object.assign({}, currState, {curPos: [newX, newY]}, {instr: newInstr});
     case 'f':
       [newX, newY] = genLineFromAngle(curX, curY, currState.curDir, dist);
@@ -112,7 +113,8 @@ function parseInstrRecurse(ctx, currState, dist=20, angle=25){
     case 'G':
       [newX, newY] = genLineFromAngle(curX, curY, currState.curDir, dist);
       // console.log('draw', curX, curY, newX, newY, currState.curDir);
-      drawLine(ctx, [curX, curY, newX, newY]);
+      drawLine(ctx, [curX, curY, newX, newY], toRGB(blobColor));
+      changeColor();
       if(newInstr.length && contDrawing) return window.requestAnimFrame(parseInstrRecurse.bind(null, ctx, Object.assign({}, currState, {curPos: [newX, newY]}, {instr: newInstr}), dist, angle));
     case 'f':
       [newX, newY] = genLineFromAngle(curX, curY, currState.curDir, dist);
@@ -160,8 +162,8 @@ function makeInstr(axiom, replace, iterations){
 }
 
 function drawLSys(ctx, data){
-  console.time('instr')
   showRender('Building...');
+  console.time('instr')
   let explodedInstr = makeInstr(data.axiom, data.replace, data.iterations || 5);
   hideRender();
   console.timeEnd('instr');

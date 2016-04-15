@@ -1,11 +1,10 @@
 'use strict';
 
 let numHits = 0;
-
 const WALKER_COLOR = 'rgb(30,30,30)';
 const WALKER_COL_ARR = [20,30,40];
 const BR_COLOR = [0,0,0];
-let BLOB_COLOR = [0,255,0];
+let blobColor = [0,255,0];
 const WALKER_WIDTH = 8;
 let blobWidth = 1;
 let blob_growth = .5;
@@ -13,28 +12,9 @@ const NUM_WALKERS = 5;
 const MAX_ITERATIONS = 500000;
 const MAX_HITS = 800;
 
-//transforms color arr to rgb/rgba str
-function toRGB(colorArr){
-  //color is rgb val
-  let startStr = 'rgb(';
-  if(colorArr.length === 4) startStr = 'rgba(';
-  let colorStr = colorArr.reduce(function(built, cur) {
-      return built + cur.toString() + ',';
-    }, startStr);
-  colorStr = colorStr.slice(0, colorStr.length-1) + ')'
-  console.log(colorStr)
-  return colorStr;
-}
-
-function changeColor(){
-  if(BLOB_COLOR[2] < 253 && BLOB_COLOR[0] === 0) BLOB_COLOR[2]+=2;
-  else if (BLOB_COLOR[1] > 2) BLOB_COLOR[1]-=2;
-  else if (BLOB_COLOR[0]< 253) BLOB_COLOR[0]+=2;
-}
-
 //choose positions of seeds
 function plantSeeds(ctx, data){
-  let color = toRGB(BLOB_COLOR);
+  let color = toRGB(blobColor);
   var seeds = genSeeds(data);
   seeds.forEach(function(seedPos){
     // console.log('seed', seedPos)
@@ -43,11 +23,15 @@ function plantSeeds(ctx, data){
     ctx.fillStyle = color
     ctx.fill();
   })
-  
 }
 
 function genSeeds(data){
   return [[getWidth()/2, getHeight()/2]];
+}
+
+function resetState(){
+  blobColor = [0,255,0];
+  numHits = 0;
 }
 
 //determines if a point is inside the image bounds
@@ -90,7 +74,7 @@ function walkRecurse(ctx, oldPos, maxIterations, iteration, maxHits, runOpt){
     let pixelPos = [ Math.floor(newPos[0]-WALKER_WIDTH/2) + collisionPixel % WALKER_WIDTH, Math.floor(newPos[1]-WALKER_WIDTH/2) + Math.floor(collisionPixel / WALKER_WIDTH) ];
 
     //draw growth
-    drawLine(ctx, genLine(oldPos[0], oldPos[1], pixelPos[0], pixelPos[1], blob_growth), toRGB(BLOB_COLOR), blobWidth);
+    drawLine(ctx, genLine(oldPos[0], oldPos[1], pixelPos[0], pixelPos[1], blob_growth), toRGB(blobColor), blobWidth);
     numHits ++;
     changeColor();
     //corner respawn
@@ -140,6 +124,7 @@ function movePos ([x,y]){
 
 
 function drawDLA(ctx, data){
+  resetState();
   plantSeeds(ctx, data);
   //start walkers
   // startWalkers(ctx, walkIt, 1, 1000)

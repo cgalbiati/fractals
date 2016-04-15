@@ -1,14 +1,16 @@
-const CANVAS_HEIGHT = 400;
-const CANVAS_WIDTH = 500;
+let canvasHeight = 400;
+let canvasWidth = 500;
 let contDrawing = true;
 let watchDraw = false;
+let canvas;
+let ctx;
 
 
 function getWidth(){
-  return CANVAS_WIDTH ? CANVAS_WIDTH : window.innerWidth;
+  return canvasWidth ? canvasWidth : window.innerWidth;
 }
 function getHeight(){
-  return CANVAS_HEIGHT ? CANVAS_HEIGHT : window.innerHeight;
+  return canvasHeight ? canvasHeight : window.innerHeight;
 }
 
 function getColor(ctx, pos){
@@ -21,6 +23,18 @@ function getColorArea(ctx, pos, size){
   return ctx.getImageData(flooredCorner[0], flooredCorner[1], size, size).data;
 }
 
+//transforms color arr to rgb/rgba str
+function toRGB(colorArr){
+  //color is rgb val
+  let startStr = 'rgb(';
+  if(colorArr.length === 4) startStr = 'rgba(';
+  let colorStr = colorArr.reduce(function(built, cur) {
+      return built + cur.toString() + ',';
+    }, startStr);
+  colorStr = colorStr.slice(0, colorStr.length-1) + ')'
+  return colorStr;
+}
+
 function drawLine(ctx, [startX, startY, endX, endY], color, lineWidth){
   // console.log('drawing', startX, startY, endX, endY)
   if (!color) color = 'white';
@@ -31,18 +45,6 @@ function drawLine(ctx, [startX, startY, endX, endY], color, lineWidth){
   ctx.lineTo(endX, endY);
   ctx.stroke();
 }
-
-
-// function drawLine(ctx, startX, startY, endX, endY, color){
-//   // console.log('hi', startX, startY, endX, endY)
-//   if (!color) color = 'rgb(0,0, 255)';
-//   ctx.beginPath();
-//   ctx.strokeStyle = color;
-//   ctx.moveTo(startX, startY);
-//   ctx.lineTo(endX, endY);
-//   ctx.stroke();
-//   // console.log(startX, startY, endX, endY, color)
-// }
 
 // generate endX and endY for a given colision direction and length
 function genLine(oldX, oldY, nX, nY, lenMult=1){
@@ -63,25 +65,27 @@ function genLineFromAngle(curX, curY, dirAngle=35, dist=20){
   return [newX, newY];
 }
 
+function changeColor(){
+  //incr blue if red is 0 and blue is less than max
+  if(blobColor[2] < 254 && blobColor[0] === 0) blobColor[2]+=2;
+  // decr green if blue is 255 and green is > 0
+  else if (blobColor[1] > 1 && blobColor[2] > 253) blobColor[1]-=2;
+  // incr red if green is 0 and red is < max
+  else if (blobColor[0] < 255 && blobColor[1] < 2) blobColor[0]+=1;
+  // decr blue if red is max and blue is > 0
+  else if (blobColor[2] > 0 && blobColor[0] > 254) blobColor[2] -= 1;
+  //incr green if red is max and green is < max
+  else if (blobColor[1] < 255 && blobColor[0] > 254) blobColor[1] += 1;
+  //decr red if green is max and red > 0
+  else if (blobColor[0] > 0 && blobColor[1] > 254) blobColor[0] -= 1;
+}
+
 
 function init (canvas, data){
   if(canvas){
     canvas.width = getWidth();
     canvas.height = getHeight();
     let ctx = canvas.getContext("2d");
-    // ctx.lineWidth=1;
-
-  //test
-  // let color = 'blue';
-  // ctx.beginPath();
-  // ctx.strokeStyle = color;
-  // ctx.lineWidth = 10;
-  // ctx.moveTo(0, 0);
-  // ctx.lineTo(0, getHeight());
-  // ctx.lineTo(getWidth(), getHeight());
-  // ctx.lineTo(getWidth(), 0);
-  // ctx.lineTo(0, 0);
-  // ctx.stroke();
 
     return ctx;
 
@@ -103,6 +107,7 @@ function startDrawing(ctx){
   setTimeout( 
     window.requestAnimFrame(function(){
       ctx.clearRect(0, 0, canvas.width, canvas.height);
+      resetState();
       contDrawing = true;
       console.log(' set true')
       let fractalFn = parseForm(ctx);
@@ -112,17 +117,6 @@ function startDrawing(ctx){
   
 }
 
-const testData = {
-  axiom: ['F','-','G','-','G'], 
-  replace:{
-    'F': ['F','-','G','+','F','+','G','-','F'], 
-    'G':['G','G']}, 
-  startPos: [getWidth()/2 - getHeight()/2, getHeight()-10],
-  dist: getHeight()/29,
-  angle:120
-}
-
-
 //parses form and returns bound fn
 function parseForm(ctx){
   let form = document.getElementById('drawing-opts');
@@ -130,6 +124,14 @@ function parseForm(ctx){
 
   //set watchdraw to val of checkbox
   watchDraw = form.watchDraw.checked ? true : false;
+
+  //set canvas size
+  canvasWidth = form.canvasWidth.value.length ? Number(form.canvasWidth.value) : 500;
+  if (canvasWidth < 5 || canvasWidth > 2000) canvasWidth = 500;
+  canvasHeight = form.canvasHeight.value.length ? Number(form.canvasHeight.value) : 500;
+  if (canvasHeight < 5 || canvasHeight > 2000) canvasHeight = 400;
+  canvas.width = canvasWidth;
+  canvas.height = canvasHeight;
 
   if(fractalType === 'lSystem'){
     let axiom = form.axiom.value.length ? form.axiom.value.split('') : ['F'];
@@ -165,30 +167,31 @@ function parseRule(ruleStr, rulesDict){
 }
 
 document.addEventListener("DOMContentLoaded", function(event) { 
-  let canvas = document.getElementById('canvas');
-  let ctx = init(canvas);
+  canvas = document.getElementById('canvas');
+  ctx = init(canvas);
 
   //register stop button
   document.getElementById('stop').addEventListener('click', function(){
-    console.log('stoped')
+    // console.log('stoped')
     //set stopDrawin to true - stops recursive calls
     contDrawing = false;
+    hideRender();
   });
   document.getElementById('start-drawing').addEventListener('click', function(){
     contDrawing = false;
-    console.log('set here false')
-    setTimeout(startDrawing.bind(window, ctx), 100)
-    
+    showRender('Rendering...');
+    // console.log('set here false')
+    setTimeout(startDrawing.bind(window, ctx), 100);
   });
   startDrawing(ctx);
 });
 
-function showRender(){
-  console.log('starting')
-  document.getElementById('rendering').innerHTML = 'Rendering...'
+function showRender(text){
+  // console.log('starting');
+  document.getElementById('rendering').innerHTML = text || 'Rendering...';
 }
 function hideRender(){
-  console.log('done')
+  // console.log('done')
   document.getElementById('rendering').innerHTML = '';
 }
 
