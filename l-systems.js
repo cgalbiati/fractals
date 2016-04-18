@@ -70,7 +70,9 @@ var lSysData = {
   //instr
 //}
 
-function parseInstrIt(ctx, currState, dist=20, angle=25){
+function parseInstrIt(ctx, currState, dist, angle){
+  if(!dist) dist = 20; 
+  if (!angle) angle = 25;
   var curX = currState.curPos[0];
   var curY = currState.curPos[1];
   var newInstr = currState.instr.slice(1);
@@ -113,7 +115,9 @@ function parseInstrIt(ctx, currState, dist=20, angle=25){
 }
 
 
-function parseInstrRecurse(ctx, currState, dist=20, angle=25){
+function parseInstrRecurse(ctx, currState, dist, angle){
+  if(!dist) dist = 20; 
+  if (!angle) angle = 25;
   var curX = currState.curPos[0];
   var curY = currState.curPos[1];
   var newInstr = currState.instr.slice(1);
