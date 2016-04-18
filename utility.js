@@ -49,7 +49,8 @@ function drawLine(ctx, [startX, startY, endX, endY], color, lineWidth){
 }
 
 // generate endX and endY for a given colision direction and length
-function genLine(oldX, oldY, nX, nY, lenMult=1){
+function genLine(oldX, oldY, nX, nY, lenMult){
+  if (!lenMult) lenMult = 1;
   var eX = nX - (nX - oldX) * lenMult;
   var eY = nY - (nY - oldY) * lenMult;
   return [nX, nY, eX, eY];
@@ -105,7 +106,7 @@ window.requestAnimFrame = (function() {
 
 function startDrawing(ctx){
   contDrawing = false;
-  console.log(' set false')
+  console.log('set false')
   setTimeout( 
     window.requestAnimFrame(function(){
       ctx.clearRect(0, 0, canvas.width, canvas.height);
@@ -137,6 +138,9 @@ function populateForm(data){
 function parseForm(ctx){
   var form = document.getElementById('drawing-opts');
   var fractalType = form.fractalType.value;
+  if(!fractalType) {
+    if(document.getElementById('l-sys-select').checked) fractalType = 'lSystem';
+  }
 
   //set watchdraw to val of checkbox
   watchDraw = form.watchDraw.checked ? true : false;
@@ -184,6 +188,7 @@ function parseRule(ruleStr, rulesDict){
 
 document.addEventListener("DOMContentLoaded", function(event) { 
   canvas = document.getElementById('canvas');
+  console.log('got canvas', canvas)
   ctx = init(canvas);
   var inputs = document.getElementsByClassName('l-sys-only');
 
