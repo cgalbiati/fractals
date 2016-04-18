@@ -1,5 +1,6 @@
+'use strict';
 
-lSysData = {
+var lSysData = {
   truffula: {
     axiom: ['F-X'], 
     replace:{
@@ -42,12 +43,23 @@ lSysData = {
       '1': 'F=C0FF-[C1-F+F]+[C2+F-F]', 
       '2': 'X=C0FF+[C1+F]+[C3-F]'
     }, 
-    startPos: [getWidth()/2, getHeight()],
-    dist: 7,
-    angle: 25,
-    iterations: 4,
+    startPos: [getWidth()/4, getHeight()*3/4],
+    dist: getHeight()/10,
+    angle: 340,
+    iterations: 5,
     startDir: 270
-
+  },
+  spiralGrass: {
+    axiom: ['FX'], 
+    replace:{
+      '1': 'FX=FF-[-F+X-FX-F]X', 
+      '2': 'X=F-[[X]--X][-X+]F[--X]-X'
+    }, 
+    startPos: [getWidth()/4, getHeight()-getHeight()/3],
+    dist: getHeight()/8,
+    angle: 340,
+    iterations: 5,
+    startDir: 270
   }
 };
 
@@ -59,10 +71,10 @@ lSysData = {
 //}
 
 function parseInstrIt(ctx, currState, dist=20, angle=25){
-  let curX = currState.curPos[0];
-  let curY = currState.curPos[1];
-  let newInstr = currState.instr.slice(1);
-  let newDir, newStack, newX, newY;
+  var curX = currState.curPos[0];
+  var curY = currState.curPos[1];
+  var newInstr = currState.instr.slice(1);
+  var newDir, newStack, newX, newY;
   // console.log('currState', currState.instr[0],currState.instr.length, currState);
 
   switch(currState.instr[0]){
@@ -90,7 +102,7 @@ function parseInstrIt(ctx, currState, dist=20, angle=25){
       // console.log('[', Object.assign({}, currState, {curDir: currState.curDir}, {stack: newStack}, {instr: newInstr}))
       return Object.assign({}, currState, {curDir: currState.curDir}, {stack: newStack}, {instr: newInstr});
     case ']':
-      let oldPos = currState.stack[currState.stack.length-1];
+      var oldPos = currState.stack[currState.stack.length-1];
       newStack = currState.stack.slice(0, currState.stack.length-1);
       // console.log(']', Object.assign({}, currState, {curDir: oldPos.dir}, {curPos: oldPos.pos}, {stack: newStack}, {instr: newInstr}))
       return Object.assign({}, currState, {curDir: oldPos.dir}, {curPos: oldPos.pos}, {stack: newStack}, {instr: newInstr});
@@ -102,10 +114,10 @@ function parseInstrIt(ctx, currState, dist=20, angle=25){
 
 
 function parseInstrRecurse(ctx, currState, dist=20, angle=25){
-  let curX = currState.curPos[0];
-  let curY = currState.curPos[1];
-  let newInstr = currState.instr.slice(1);
-  let newDir, newStack, newX, newY;
+  var curX = currState.curPos[0];
+  var curY = currState.curPos[1];
+  var newInstr = currState.instr.slice(1);
+  var newDir, newStack, newX, newY;
   // console.log('currState', currState.instr[0],currState.instr.length, currState);
 
   switch(currState.instr[0]){
@@ -133,7 +145,7 @@ function parseInstrRecurse(ctx, currState, dist=20, angle=25){
       // console.log('[', Object.assign({}, currState, {curDir: currState.curDir}, {stack: newStack}, {instr: newInstr}))
       if(newInstr.length && contDrawing) return window.requestAnimFrame(parseInstrRecurse.bind(null, ctx, Object.assign({}, currState, {curDir: currState.curDir}, {stack: newStack}, {instr: newInstr}), dist, angle));
     case ']':
-      let oldPos = currState.stack[currState.stack.length-1];
+      var oldPos = currState.stack[currState.stack.length-1];
       newStack = currState.stack.slice(0, currState.stack.length-1);
       // console.log(']', Object.assign({}, currState, {curDir: oldPos.dir}, {curPos: oldPos.pos}, {stack: newStack}, {instr: newInstr}))
       if(newInstr.length && contDrawing) return window.requestAnimFrame(parseInstrRecurse.bind(null, ctx, Object.assign({}, currState, {curDir: oldPos.dir}, {curPos: oldPos.pos}, {stack: newStack}, {instr: newInstr}), dist, angle));
@@ -149,7 +161,7 @@ function parseInstrRecurse(ctx, currState, dist=20, angle=25){
 
 //replace = {orig, repl=[]} //can have mult rules
 function makeInstr(axiom, replace, iterations){
-  for(let i = 0; i<iterations; i++){
+  for(var i = 0; i<iterations; i++){
     axiom = axiom.reduce(function(built, cmd){
       // console.log(built, cmd)
       if (replace[cmd]) return built.concat(replace[cmd]);
@@ -164,11 +176,11 @@ function makeInstr(axiom, replace, iterations){
 function drawLSys(ctx, data){
   showRender('Building...');
   console.time('instr')
-  let explodedInstr = makeInstr(data.axiom, data.replace, data.iterations || 5);
+  var explodedInstr = makeInstr(data.axiom, data.replace, data.iterations || 5);
   hideRender();
   console.timeEnd('instr');
 
-  let currState = {curPos: data.startPos || [200,200], stack: [], curDir: data.startDir || 270, instr: explodedInstr};
+  var currState = {curPos: data.startPos || [200,200], stack: [], curDir: data.startDir || 270, instr: explodedInstr};
   console.log('watch', watchDraw)
   showRender('Rendering...');
   if(watchDraw){
@@ -187,7 +199,7 @@ function drawLSys(ctx, data){
 //pos start data:
 
 //should be triangle
-const triangles = {
+var triangles = {
   axiom: ['F','-','G','-','G'], 
   replace:{
     'F': ['F','-','G','+','F','+','G','-','F'], 
@@ -197,12 +209,12 @@ const triangles = {
   angle:120
 }
 
-// const data = {axiom: ['F','X'], replace:{'F': ['X','+','Y','F','+'], Y: ['-','F','X','-','Y']}, angle:90}
+// var data = {axiom: ['F','X'], replace:{'F': ['X','+','Y','F','+'], Y: ['-','F','X','-','Y']}, angle:90}
 
-// const data = {axiom: ['-','F'], replace:{'F': ['F','+','F','-','F','-','F','+','F']}, angle:90}
+// var data = {axiom: ['-','F'], replace:{'F': ['F','+','F','-','F','-','F','+','F']}, angle:90}
 
 //tree-like thing
-// const curveTree = {
+// var curveTree = {
 //   axiom: ['F','-','X'], 
 //   replace:{
 //     'F': ['F','F'], 
@@ -214,7 +226,7 @@ const triangles = {
 //   startPos:[0,getHeight()]
 // }
 
-// const bushTree = {
+// var bushTree = {
 //   axiom: ['F'], 
 //   replace:{
 //     'F': ['F','F','-','[','-','F','+','F','+','F',']','+','[','+','F','-','F','-','F',']'] 
@@ -228,23 +240,23 @@ const triangles = {
 // }
 
 
-// let data = {axiom: ['+','+','F','+','F'], replace:{'F': ['F', '+', '+', 'F', 'F', '-', 'F', '+', 'F', '+', 'F', 'F','+']}}
-// let data = {axiom: ['+','+','+','+','+','F'], replace:{'F': ['F','F','-','[','-','F','+','F','+','F',']','+','[','+','F','-','F','-','F',']']}}
-// let data = {axiom: ['F','+','+', 'F','+','+','F',], replace:{'F': ['F','-','F','+','+','F','-','F']}}
+// var data = {axiom: ['+','+','F','+','F'], replace:{'F': ['F', '+', '+', 'F', 'F', '-', 'F', '+', 'F', '+', 'F', 'F','+']}}
+// var data = {axiom: ['+','+','+','+','+','F'], replace:{'F': ['F','F','-','[','-','F','+','F','+','F',']','+','[','+','F','-','F','-','F',']']}}
+// var data = {axiom: ['F','+','+', 'F','+','+','F',], replace:{'F': ['F','-','F','+','+','F','-','F']}}
 //should be tree
-// let data = {axiom: ['X'], replace:{'F': ['F','F'], 'X': ['F','-','[','[','X',']','+','X',']','+','F','[','+','F','X',']','-','X']}}
+// var data = {axiom: ['X'], replace:{'F': ['F','F'], 'X': ['F','-','[','[','X',']','+','X',']','+','F','[','+','F','X',']','-','X']}}
 
 
 
 // document.addEventListener("DOMContentLoaded", function(event) { 
-//   let canvas = document.getElementById('canvas');
-//   let ctx = init(canvas, data);
+//   var canvas = document.getElementById('canvas');
+//   var ctx = init(canvas, data);
 
 //   console.time('instr')
-//   let explodedInstr = makeInstr(data.axiom, data.replace, data.iterations || 5);
+//   var explodedInstr = makeInstr(data.axiom, data.replace, data.iterations || 5);
 //   console.timeEnd('instr');
 
-//   let currState = {curPos: data.startPos || [200,200], stack: [], curDir: data.startDir || 0, instr: explodedInstr};
+//   var currState = {curPos: data.startPos || [200,200], stack: [], curDir: data.startDir || 0, instr: explodedInstr};
 
 //   if(watchDraw){
 //     console.time('animatedraw')
@@ -283,9 +295,9 @@ const triangles = {
 // //replace = {orig, repl=[]} //can have mult rules
 // function makeInstrLoop(axiom, replace, iterations){
 //   // var result = axiom;
-//   // for(let i = 0; i<iterations; i++){
-//   //   let newRes = [];
-//   //   for(let j = 0; j<result.length; j++){
+//   // for(var i = 0; i<iterations; i++){
+//   //   var newRes = [];
+//   //   for(var j = 0; j<result.length; j++){
 //   //     newRes.push(replace[result[j]] ? replace[result[j]] : j);
 //   //     if()
 //   //   }
