@@ -1,20 +1,20 @@
 'use strict';
 
-let numHits = 0;
-const WALKER_COLOR = 'rgb(30,30,30)';
-const WALKER_COL_ARR = [20,30,40];
-const BR_COLOR = [0,0,0];
-let blobColor = [0,255,0];
-const WALKER_WIDTH = 8;
-let blobWidth = 1;
-let blob_growth = .5;
-const NUM_WALKERS = 5;
-const MAX_ITERATIONS = 500000;
-const MAX_HITS = 800;
+var numHits = 0;
+var WALKER_COLOR = 'rgb(30,30,30)';
+var WALKER_COL_ARR = [20,30,40];
+var BR_COLOR = [0,0,0];
+var blobColor = [0,255,0];
+var WALKER_WIDTH = 8;
+var blobWidth = 1;
+var blob_growth = .5;
+var NUM_WALKERS = 5;
+var MAX_ITERATIONS = 500000;
+var MAX_HITS = 800;
 
 //choose positions of seeds
 function plantSeeds(ctx, data){
-  let color = toRGB(blobColor);
+  var color = toRGB(blobColor);
   var seeds = genSeeds(data);
   seeds.forEach(function(seedPos){
     // console.log('seed', seedPos)
@@ -42,13 +42,13 @@ function testBounds(){
 //tests if each pixel is part of blob and returns pixel num || -1
 function compColorArea(colorsArr, testingArr, errorMargin){
   // console.log('comparing', colorsArr, testingArr)
-  for(let i = 0; i<testingArr.length; i+=4){
-    for(let j = 0; j<colorsArr.length; j++){
+  for(var i = 0; i<testingArr.length; i+=4){
+    for(var j = 0; j<colorsArr.length; j++){
       //if color at that spot is higher than walker color and not alpha value
       if(j !== 3 && testingArr[i+j] > colorsArr[j] + errorMargin) {
         //test to make sure alpha val is not skewing numbers
         // console.log('found intersect', i, j, testingArr[i+j], testingArr[j], testingArr[i+3], testingArr)
-        let alpha = testingArr[i+3];
+        var alpha = testingArr[i+3];
         //returns n where matching pixel is nth in testing arr
         if(alpha > 100) return Math.floor(i/4);
       }
@@ -59,19 +59,19 @@ function compColorArea(colorsArr, testingArr, errorMargin){
 
 function walkRecurse(ctx, oldPos, maxIterations, iteration, maxHits, runOpt){
   // console.log('old', oldPos)
-  let newPos = movePos(oldPos);
+  var newPos = movePos(oldPos);
   // console.log('newPos', newPos)
   //get land pixel
-  let flooredPos = [Math.floor(newPos[0]), Math.floor(newPos[1])];
-  let color = getColorArea(ctx, newPos, WALKER_WIDTH);
+  var flooredPos = [Math.floor(newPos[0]), Math.floor(newPos[1])];
+  var color = getColorArea(ctx, newPos, WALKER_WIDTH);
   // console.log('color', color, newPos)
 
   // reliably tests if point is on blob
   // if((color[0]>WALKER_COL_ARR[0]+20 || color[1]>WALKER_COL_ARR[1]+20 || color[2]>WALKER_COL_ARR[2]+20) && color[3]>50) {
-  let collisionPixel = compColorArea(WALKER_COL_ARR, color, 20);
+  var collisionPixel = compColorArea(WALKER_COL_ARR, color, 20);
   if (collisionPixel>-1){
     //find position of colision pixel
-    let pixelPos = [ Math.floor(newPos[0]-WALKER_WIDTH/2) + collisionPixel % WALKER_WIDTH, Math.floor(newPos[1]-WALKER_WIDTH/2) + Math.floor(collisionPixel / WALKER_WIDTH) ];
+    var pixelPos = [ Math.floor(newPos[0]-WALKER_WIDTH/2) + collisionPixel % WALKER_WIDTH, Math.floor(newPos[1]-WALKER_WIDTH/2) + Math.floor(collisionPixel / WALKER_WIDTH) ];
 
     //draw growth
     drawLine(ctx, genLine(oldPos[0], oldPos[1], pixelPos[0], pixelPos[1], blob_growth), toRGB(blobColor), blobWidth);
@@ -108,15 +108,15 @@ function walkRecurse(ctx, oldPos, maxIterations, iteration, maxHits, runOpt){
 }
 
 function movePos ([x,y]){
-  let xChange = (Math.random()-.5)*10;
-  let yChange = (Math.random()-.5)*10;
+  var xChange = (Math.random()-.5)*10;
+  var yChange = (Math.random()-.5)*10;
   // console.log(xChange, yChange)
 
   //bounce
-  let newX = (x + xChange < 0 || x + xChange >= window.innerWidth) ? x - xChange : x + xChange;
-  let newY = (y + yChange < 0 || y + yChange >= window.innerHeight) ? y - yChange : y + yChange;
-  // let newX = (x + xChange < 0 || x + xChange >= window.innerWidth) ? Math.random()*getWidth() : x + xChange;
-  // let newY = (y + yChange < 0 || y + yChange >= window.innerHeight) ? Math.random()*getHeight() : y + yChange;
+  var newX = (x + xChange < 0 || x + xChange >= window.innerWidth) ? x - xChange : x + xChange;
+  var newY = (y + yChange < 0 || y + yChange >= window.innerHeight) ? y - yChange : y + yChange;
+  // var newX = (x + xChange < 0 || x + xChange >= window.innerWidth) ? Math.random()*getWidth() : x + xChange;
+  // var newY = (y + yChange < 0 || y + yChange >= window.innerHeight) ? Math.random()*getHeight() : y + yChange;
 
   return [newX, newY];
 }
@@ -133,9 +133,9 @@ function drawDLA(ctx, data){
 }
 
 function startWalkers(ctx, walkFn, numWalkers, iterations, maxHits){
-  for (let i = 0; i<numWalkers; i++){
+  for (var i = 0; i<numWalkers; i++){
     [0,1,2,3, 4, 5, 6, 7].forEach(function(j){
-      let [x,y] = pickCorner(j, getWidth(), getHeight());
+      var [x,y] = pickCorner(j, getWidth(), getHeight());
       // console.log('starting',j, x, y)
       walkFn(ctx, [x, y], iterations, 0, maxHits);
     })
@@ -203,14 +203,14 @@ function pickCorner(n, difX, difY){
 
 
 // function walkIt(ctx, startPos, max){
-//   let newPos = startPos;
+//   var newPos = startPos;
 //   console.log('newPos', newPos)
-//   let oldPos, color;
+//   var oldPos, color;
 
 //     window.requestAnimFrame(walkerStuff)
   
 
-//   // for(let i = 0; i<max; i++){
+//   // for(var i = 0; i<max; i++){
 //   //   oldPos = newPos.slice();
 //   //   newPos = movePos(oldPos);
 //   //   console.log('newPos', newPos)
@@ -238,21 +238,21 @@ function pickCorner(n, difX, difY){
 // }
 
 // function moveLeft([x, y]){
-//   let xChange = (Math.random()-.8)*2;
-//   let yChange = (Math.random()-.5) * 2;
+//   var xChange = (Math.random()-.8)*2;
+//   var yChange = (Math.random()-.5) * 2;
 //   // console.log(xChange, yChange)
 
 //   //bounce
-//   let newX = (x + xChange < 0 || x + xChange >= window.innerWidth) ? x - xChange : x + xChange;
-//   let newY = (y + yChange < 0 || y + yChange >= window.innerHeight) ? y - yChange : y + yChange;
+//   var newX = (x + xChange < 0 || x + xChange >= window.innerWidth) ? x - xChange : x + xChange;
+//   var newY = (y + yChange < 0 || y + yChange >= window.innerHeight) ? y - yChange : y + yChange;
   
 //   return [newX, newY];
 // }
 
 
 // document.addEventListener("DOMContentLoaded", function(event) { 
-//   let canvas = document.getElementById('canvas');
-//   let ctx = init(canvas, data);
+//   var canvas = document.getElementById('canvas');
+//   var ctx = init(canvas, data);
 
 //   plantSeeds(ctx, data);
 
