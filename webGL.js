@@ -1,7 +1,7 @@
 var gl; // A global variable for the WebGL context
 
 function start() {
-  var canvas = document.getElementById("glcanvas");
+  var canvas = document.getElementById("canvas");
 
   // Initialize the GL context
   gl = initWebGL(canvas);
@@ -41,3 +41,15 @@ function initWebGL(canvas) {
 function resize(gl, canvas){
   gl.viewport(0, 0, canvas.width, canvas.height);
 }
+
+  function webGLStart() {
+    var canvas = document.getElementById("lesson01-canvas");
+    initGL(canvas);
+    initShaders();
+    initBuffers();
+
+    gl.clearColor(0.0, 0.0, 0.0, 1.0);
+    gl.enable(gl.DEPTH_TEST);
+
+    drawScene();
+  }
