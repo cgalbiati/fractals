@@ -1,14 +1,14 @@
 'use strict';
 
 var numHits = 0;
-var WALKER_COLOR = 'rgb(30,30,30)';
-var WALKER_COL_ARR = [20,30,40];
+// var WALKER_COLOR = 'rgb(30,30,30)';
+var WALKER_COLOR = [20,20,20];
 var BR_COLOR = [0,0,0];
 var blobColor = [0,255,0];
 var WALKER_WIDTH = 4;
 var blobWidth = 1;
 var blob_growth = .5;
-var NUM_WALKERS = 8;
+var NUM_WALKERS = 10;
 var MAX_ITERATIONS = 500000;
 var MAX_HITS = getWidth()*3;
 var board = makeBoard(getWidth(), getHeight());
@@ -18,10 +18,12 @@ function plantSeeds(ctx, data){
   var color = toRGB(blobColor);
   var seeds = genSeeds(data);
   seeds.forEach(function(seedPos){
-    ctx.beginPath();
-    ctx.arc(seedPos[0], seedPos[1], 1, 0, 360);
-    ctx.fillStyle = color
-    ctx.fill();
+    if(drawType === 'canvas'){
+      ctx.beginPath();
+      ctx.arc(seedPos[0], seedPos[1], 1, 0, 360);
+      ctx.fillStyle = color
+      ctx.fill();
+    }
     board[seedPos[0]][seedPos[1]] = 1;
   });
 }
@@ -70,7 +72,7 @@ function walkRecurse(ctx, oldPos, maxIterations, iteration, maxHits, runOpt){
       board[pt[0]][pt[1]] = 1;
     })
     //draw growth
-    drawLine(ctx, genLine(collisionPixel[0], collisionPixel[1], oldPos[0], oldPos[1], 1), toRGB(blobColor), blobWidth);
+    drawLine(ctx, genLine(collisionPixel[0], collisionPixel[1], oldPos[0], oldPos[1], 1), blobColor, blobWidth);
     numHits ++;
     changeColor();
     //corner respawn
@@ -209,7 +211,7 @@ function pickCorner(n, difX, difY){
   // console.log(n)
   var halfX = Math.floor(difX/2);
   var halfY = Math.floor(difY/2);
-  console.log('starting walker', difY, difX)
+  // console.log('starting walker', difY, difX)
   switch(n){
     case 0:
       return [0, 0];

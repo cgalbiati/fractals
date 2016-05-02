@@ -1,78 +1,81 @@
 'use strict';
 
-var lSysData = {
-  truffula: {
-    axiom: ['F-X'], 
-    replace:{
-      '1': 'F=FF', 
-      '2': 'X=F-[[X]+X][-X+]F[X]-X',
-    }, 
-    angle:25, 
-    startDir: 300,
-    dist:getHeight()/80, 
-    iterations: 5,
-    startPos:[getWidth()/3,getHeight()]
-  },
-  bushTree: {
-    axiom: ['FX'], 
-    replace:{
-      '1': 'F=FF-[-F+F+F]+[+F-F-F]', 
-      '2': 'X=F-[[X]+X][-X+]F[X]-X'
-    }, 
-    angle:25, 
-    startDir: 270,
-    iterations:4,
-    dist:getHeight()/60, 
-    iterations: 4,
-    startPos:[getWidth()/2,getHeight()]
-  },
-  triangles:{
-    axiom: ['F-G-G'], 
-    replace:{
-      '1': 'F=F-G+F+G-F', 
-      '2':'G=GG'}, 
-    startPos: [getWidth()/2, 10],
-    dist: getHeight()/29,
-    angle: 120,
-    iterations: 5,
-    startDir: 120
-  },
-  tree: {
-    axiom: ['FX'], 
-    replace:{
-      '1': 'F=C0FF-[C1-F+F]+[C2+F-F]', 
-      '2': 'X=C0FF+[C1+F]+[C3-F]'
-    }, 
-    startPos: [getWidth()/4, getHeight()*3/4],
-    dist: getHeight()/10,
-    angle: 340,
-    iterations: 5,
-    startDir: 270
-  },
-  spiralGrass: {
-    axiom: ['FX'], 
-    replace:{
-      '1': 'FX=FF-[-F+X-FX-F]X', 
-      '2': 'X=F-[[X]--X][-X+]F[--X]-X'
-    }, 
-    startPos: [getWidth()/4, getHeight()-getHeight()/3],
-    dist: getHeight()/8,
-    angle: 340,
-    iterations: 5,
-    startDir: 270
-  }
-};
+function lSysData(){
+  return {
+    truffula: {
+      axiom: ['F-X'], 
+      replace:{
+        '1': 'F=FF', 
+        '2': 'X=F-[[X]+X][-X+]F[X]-X',
+      }, 
+      angle:25, 
+      startDir: 300,
+      dist:getHeight()/80, 
+      iterations: 5,
+      startPos:[getWidth()/3,getHeight()]
+    },
+    bushTree: {
+      axiom: ['FX'], 
+      replace:{
+        '1': 'F=FF-[-F+F+F]+[+F-F-F]', 
+        '2': 'X=F-[[X]+X][-X+]F[X]-X'
+      }, 
+      angle:25, 
+      startDir: 270,
+      iterations:4,
+      dist:getHeight()/60, 
+      startPos:[getWidth()/2,getHeight()]
+    },
+    triangles:{
+      axiom: ['F-G-G'], 
+      replace:{
+        '1': 'F=F-G+F+G-F', 
+        '2':'G=GG'}, 
+      startPos: [getWidth()/2, 10],
+      dist: getHeight()/29,
+      angle: 120,
+      iterations: 5,
+      startDir: 120
+    },
+    tree: {
+      axiom: ['FX'], 
+      replace:{
+        '1': 'F=C0FF-[C1-F+F]+[C2+F-F]', 
+        '2': 'X=C0FF+[C1+F]+[C3-F]'
+      }, 
+      startPos: [getWidth()/2, getHeight()],
+      dist: getHeight()/60,
+      angle:25,
+      iterations: 4,
+      startDir: 270
+    },
+    spiralGrass: {
+      axiom: ['FX'], 
+      replace:{
+        '1': 'FX=FF-[-F+X-FX-F]X', 
+        '2': 'X=F-[[X]--X][-X+]F[--X]-X'
+      }, 
+      startPos: [getWidth()/4, getHeight()-getHeight()/3],
+      dist: getHeight()/8,
+      angle: 340,
+      iterations: 5,
+      startDir: 270
+    }
+  };
+}
 
 //currState: {
   //curPos: [x,y]
   //stack [x,y,color]
   //curDir
   //instr
+  //dist
+  //angle
 //}
 
-function parseInstrIt(ctx, currState, dist, angle){
-  if(!dist) dist = 20; 
-  if (!angle) angle = 25;
+function parseInstrIt(ctx, currState){
+  // if(!dist) dist = 20; 
+  // if (!angle) angle = 25;
   var curX = currState.curPos[0];
   var curY = currState.curPos[1];
   var newInstr = currState.instr.slice(1);
@@ -82,21 +85,21 @@ function parseInstrIt(ctx, currState, dist, angle){
   switch(currState.instr[0]){
     case 'F':
     case 'G':
-      [newX, newY] = genLineFromAngle(curX, curY, currState.curDir, dist);
+      [newX, newY] = genLineFromAngle(curX, curY, currState.curDir, currState.dist);
       // console.log('draw', curX, curY, newX, newY, currState.curDir);
-      drawLine(ctx, [curX, curY, newX, newY], toRGB(blobColor));
+      drawLine(ctx, [curX, curY, newX, newY], blobColor);
       changeColor();
       return Object.assign({}, currState, {curPos: [newX, newY]}, {instr: newInstr});
     case 'f':
-      [newX, newY] = genLineFromAngle(curX, curY, currState.curDir, dist);
+      [newX, newY] = genLineFromAngle(curX, curY, currState.curDir, currState.dist);
       // console.log('move', curX, curY, newX, newY, currState.curDir);
       return Object.assign({}, currState, {curPos: [newX, newY]}, {instr: newInstr});
     case '+':
-      newDir = currState.curDir + angle <= 360 ? currState.curDir + angle : currState.curDir + angle - 360;
+      newDir = currState.curDir + currState.angle <= 360 ? currState.curDir + currState.angle : currState.curDir + currState.angle - 360;
       // console.log('+', 'newDir',newDir)
       return Object.assign({}, currState, {curDir: newDir}, {instr: newInstr});
     case '-':
-      newDir = currState.curDir - angle >= 0 ? currState.curDir - angle : currState.curDir - angle + 360;
+      newDir = currState.curDir - currState.angle >= 0 ? currState.curDir - currState.angle : currState.curDir - currState.angle + 360;
       // console.log('-', 'newDir',newDir)
       return Object.assign({}, currState, {curDir: newDir}, {instr: newInstr});
     case '[':
@@ -115,9 +118,9 @@ function parseInstrIt(ctx, currState, dist, angle){
 }
 
 
-function parseInstrRecurse(ctx, currState, dist, angle){
-  if(!dist) dist = 20; 
-  if (!angle) angle = 25;
+function parseInstrRecurse(ctx, currState){
+  // if(!dist) dist = 20; 
+  // if (!angle) angle = 25;
   var curX = currState.curPos[0];
   var curY = currState.curPos[1];
   var newInstr = currState.instr.slice(1);
@@ -127,35 +130,35 @@ function parseInstrRecurse(ctx, currState, dist, angle){
   switch(currState.instr[0]){
     case 'F':
     case 'G':
-      [newX, newY] = genLineFromAngle(curX, curY, currState.curDir, dist);
+      [newX, newY] = genLineFromAngle(curX, curY, currState.curDir, currState.dist);
       // console.log('draw', curX, curY, newX, newY, currState.curDir);
-      drawLine(ctx, [curX, curY, newX, newY], toRGB(blobColor));
+      drawLine(ctx, [curX, curY, newX, newY], blobColor);
       changeColor();
-      if(newInstr.length && contDrawing) return window.requestAnimFrame(parseInstrRecurse.bind(null, ctx, Object.assign({}, currState, {curPos: [newX, newY]}, {instr: newInstr}), dist, angle));
+      if(newInstr.length && contDrawing) return window.requestAnimFrame(parseInstrRecurse.bind(null, ctx, Object.assign({}, currState, {curPos: [newX, newY]}, {instr: newInstr})));
     case 'f':
-      [newX, newY] = genLineFromAngle(curX, curY, currState.curDir, dist);
+      [newX, newY] = genLineFromAngle(curX, curY, currState.curDir, currState.dist);
       // console.log('move', curX, curY, newX, newY, currState.curDir);
-      if(newInstr.length && contDrawing) return window.requestAnimFrame(parseInstrRecurse.bind(null, ctx, Object.assign({}, currState, {curPos: [newX, newY]}, {instr: newInstr}), dist, angle));
+      if(newInstr.length && contDrawing) return window.requestAnimFrame(parseInstrRecurse.bind(null, ctx, Object.assign({}, currState, {curPos: [newX, newY]}, {instr: newInstr})));
     case '+':
-      newDir = currState.curDir + angle <= 360 ? currState.curDir + angle : currState.curDir + angle - 360;
+      newDir = currState.curDir + currState.angle <= 360 ? currState.curDir + currState.angle : currState.curDir + currState.angle - 360;
       // console.log('+', 'newDir',newDir)
-      if(newInstr.length && contDrawing) return window.requestAnimFrame(parseInstrRecurse.bind(null, ctx, Object.assign({}, currState, {curDir: newDir}, {instr: newInstr}), dist, angle));
+      if(newInstr.length && contDrawing) return window.requestAnimFrame(parseInstrRecurse.bind(null, ctx, Object.assign({}, currState, {curDir: newDir}, {instr: newInstr})));
     case '-':
-      newDir = currState.curDir - angle >= 0 ? currState.curDir - angle : currState.curDir - angle + 360;
+      newDir = currState.curDir - currState.angle >= 0 ? currState.curDir - currState.angle : currState.curDir - currState.angle + 360;
       // console.log('-', 'newDir',newDir)
-      if(newInstr.length && contDrawing) return window.requestAnimFrame(parseInstrRecurse.bind(null, ctx, Object.assign({}, currState, {curDir: newDir}, {instr: newInstr}), dist, angle));
+      if(newInstr.length && contDrawing) return window.requestAnimFrame(parseInstrRecurse.bind(null, ctx, Object.assign({}, currState, {curDir: newDir}, {instr: newInstr})));
     case '[':
       newStack = currState.stack.concat({pos:currState.curPos, dir:currState.curDir});
       // console.log('[', Object.assign({}, currState, {curDir: currState.curDir}, {stack: newStack}, {instr: newInstr}))
-      if(newInstr.length && contDrawing) return window.requestAnimFrame(parseInstrRecurse.bind(null, ctx, Object.assign({}, currState, {curDir: currState.curDir}, {stack: newStack}, {instr: newInstr}), dist, angle));
+      if(newInstr.length && contDrawing) return window.requestAnimFrame(parseInstrRecurse.bind(null, ctx, Object.assign({}, currState, {curDir: currState.curDir}, {stack: newStack}, {instr: newInstr})));
     case ']':
       var oldPos = currState.stack[currState.stack.length-1];
       newStack = currState.stack.slice(0, currState.stack.length-1);
       // console.log(']', Object.assign({}, currState, {curDir: oldPos.dir}, {curPos: oldPos.pos}, {stack: newStack}, {instr: newInstr}))
-      if(newInstr.length && contDrawing) return window.requestAnimFrame(parseInstrRecurse.bind(null, ctx, Object.assign({}, currState, {curDir: oldPos.dir}, {curPos: oldPos.pos}, {stack: newStack}, {instr: newInstr}), dist, angle));
-    default: if(newInstr.length && contDrawing) return window.requestAnimFrame(parseInstrRecurse.bind(null, ctx, Object.assign({}, currState, {instr: newInstr}), dist, angle));
+      if(newInstr.length && contDrawing) return window.requestAnimFrame(parseInstrRecurse.bind(null, ctx, Object.assign({}, currState, {curDir: oldPos.dir}, {curPos: oldPos.pos}, {stack: newStack}, {instr: newInstr})));
+    default: if(newInstr.length && contDrawing) return window.requestAnimFrame(parseInstrRecurse.bind(null, ctx, Object.assign({}, currState, {instr: newInstr})));
   }
-  if(newInstr.length && contDrawing) return window.requestAnimFrame(parseInstrRecurse.bind(null, ctx, Object.assign({}, currState, {instr: newInstr}), dist, angle));
+  if(newInstr.length && contDrawing) return window.requestAnimFrame(parseInstrRecurse.bind(null, ctx, Object.assign({}, currState, {instr: newInstr})));
   console.timeEnd('animatedraw')
   // console.timeEnd('draw')
   hideRender();
@@ -167,7 +170,6 @@ function parseInstrRecurse(ctx, currState, dist, angle){
 function makeInstr(axiom, replace, iterations){
   for(var i = 0; i<iterations; i++){
     axiom = axiom.reduce(function(built, cmd){
-      // console.log(built, cmd)
       if (replace[cmd]) return built.concat(replace[cmd]);
       else return built.concat(cmd);
     }, []);
@@ -184,16 +186,23 @@ function drawLSys(ctx, data){
   hideRender();
   console.timeEnd('instr');
 
-  var currState = {curPos: data.startPos || [200,200], stack: [], curDir: data.startDir || 270, instr: explodedInstr};
+  var currState = {
+    curPos: data.startPos || [200,200], 
+    stack: [], 
+    curDir: data.startDir || 270, 
+    instr: explodedInstr,
+    dist: data.dist || 10,
+    angle: data.angle || 60
+  };
   console.log('watch', watchDraw)
   showRender('Rendering...');
   if(watchDraw){
     console.time('animatedraw')
-    parseInstrRecurse(ctx, currState, data.dist || 20, data.angle);
+    parseInstrRecurse(ctx, currState);
   } else {
     console.time('draw')
     while(currState.instr.length){
-      currState = parseInstrIt(ctx, currState, data.dist || 20, data.angle);
+      currState = parseInstrIt(ctx, currState);
     }
     hideRender();
     console.timeEnd('draw')
