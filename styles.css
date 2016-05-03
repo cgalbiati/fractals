@@ -33,3 +33,34 @@ input {
 * {
   font-family: 'Comfortaa', serif;
 }
+
+body {
+  background: #7ab8a8; /* For browsers that do not support gradients */
+  background: -webkit-linear-gradient(left top, #7ab8a8, #7aa8b8); /* For Safari 5.1 to 6.0 */
+  background: -o-linear-gradient(bottom right, #7ab8a8, #7aa8b8); /* For Opera 11.1 to 12.0 */
+  background: -moz-linear-gradient(bottom right, #7ab8a8, #7aa8b8); /* For Firefox 3.6 to 15 */
+  background: linear-gradient(to bottom right, #7ab8a8, #7aa8b8); /* Standard syntax */
+}
+
+.hint {
+  display: none;
+  /*display: block;*/
+  padding-left: 50px;
+  line-height: .5;
+  font-size: .9em;
+  color: gray;
+  max-width: 100%;
+}
+.show-hint{
+  display: inline;
+  color: blue;
+  font-style: italic;
+}
+
+
+.show-hint:hover .hint{
+  display: block;
+}
+
+
+

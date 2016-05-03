@@ -1,55 +1,111 @@
 var gl; // A global variable for the WebGL context
 
-function start() {
-  var canvas = document.getElementById("canvas");
-
-  // Initialize the GL context
-  gl = initWebGL(canvas);
-  
-  // Only continue if WebGL is available and working
-  
-  if (gl) {
-    // Set clear color to black, fully opaque
-    gl.clearColor(0.0, 0.0, 0.0, 1.0);
-    // Enable depth testing
-    gl.enable(gl.DEPTH_TEST);
-    // Near things obscure far things
-    gl.depthFunc(gl.LEQUAL);
-    // Clear the color as well as the depth buffer.
-    gl.clear(gl.COLOR_BUFFER_BIT | gl.DEPTH_BUFFER_BIT);
-  }
-}
-
-function initWebGL(canvas) {
-  gl = null;
-  
+function initGl(canvas){
+  canvas = document.getElementById("gl-canvas");
+  canvas.style.display='inline-block';
   try {
     // Try to grab the standard context. If it fails, fallback to experimental.
-    gl = canvas.getContext("webgl") || canvas.getContext("experimental-webgl");
+    drawType = 'webGL';
+    gl = canvas.getContext("webgl", {preserveDrawingBuffer: true}) || canvas.getContext("experimental-webgl", {preserveDrawingBuffer: true});
+    console.log('gl???', gl)
   }
-  catch(e) {}
-  
-  // If we don't have a GL context, give up now
-  if (!gl) {
-    alert("Unable to initialize WebGL. Your browser may not support it.");
-    gl = null;
+    catch(e) {
+      console.log('problem getting gl')
+      drawType = 'canvas';
+      initCanvas(canvas);
   }
-  
+  //set canvas size
+  canvas.width = getWidth();
+  canvas.height = getHeight();
+  console.log('gl here', gl)
+  clearGL();
+
+  //compile shaders
+  var v = document.getElementById("vertex").firstChild.nodeValue;
+  var f = document.getElementById("fragment").firstChild.nodeValue;
+   
+  var vs = gl.createShader(gl.VERTEX_SHADER);
+  gl.shaderSource(vs, v);
+  gl.compileShader(vs);
+   
+  var fs = gl.createShader(gl.FRAGMENT_SHADER);
+  gl.shaderSource(fs, f);
+  gl.compileShader(fs);
+   
+  program = gl.createProgram();
+  gl.attachShader(program, vs);
+  gl.attachShader(program, fs);
+  gl.linkProgram(program);
+
+  //log if problems
+  if (!gl.getShaderParameter(vs, gl.COMPILE_STATUS))
+    console.log(gl.getShaderInfoLog(vs));
+   
+  if (!gl.getShaderParameter(fs, gl.COMPILE_STATUS))
+    console.log(gl.getShaderInfoLog(fs));
+   
+  if (!gl.getProgramParameter(program, gl.LINK_STATUS))
+    console.log(gl.getProgramInfoLog(program));
+  console.log('gl', gl)
   return gl;
 }
 
-function resize(gl, canvas){
-  gl.viewport(0, 0, canvas.width, canvas.height);
+function clearGL(){
+  //set viewport to entire canvas
+  gl.viewport(0, 0, getWidth(), getHeight());
+  //set color to black, fully opaque
+  gl.clearColor(0, 0, 0, 1.0);
+  gl.clear(gl.COLOR_BUFFER_BIT);
 }
 
-  function webGLStart() {
-    var canvas = document.getElementById("lesson01-canvas");
-    initGL(canvas);
-    initShaders();
-    initBuffers();
+function drawLineGL(ctx, [startX, startY, endX, endY], color, lineWidth){
+  // gl.clear(gl.COLOR_BUFFER_BIT);
+  //convert points
+  [startX, startY, endX, endY] = fromPixPosToGlCoord([startX, startY]).concat(fromPixPosToGlCoord([endX, endY]));
 
-    gl.clearColor(0.0, 0.0, 0.0, 1.0);
-    gl.enable(gl.DEPTH_TEST);
+  //convert color
+  color = fromRgbToGlCol(color);
+  while (color.length < 4) color.push(1)
+  var vertices = new Float32Array([
+             startX, startY, endX, endY
+          ]);
 
-    drawScene();
-  }
+  vbuffer = gl.createBuffer();
+  gl.bindBuffer(gl.ARRAY_BUFFER, vbuffer);                                       
+  gl.bufferData(gl.ARRAY_BUFFER, vertices, gl.STATIC_DRAW);
+   
+  itemSize = 2;
+  numItems = vertices.length / itemSize;
+
+  //use program for any subsequent calls
+  gl.useProgram(program);
+  
+  //assign uColor to var on program to access in future
+  program.uColor = gl.getUniformLocation(program, "uColor");
+  //set color (r,b,g,a)
+  gl.uniform4fv(program.uColor, color);
+   
+  program.aVertexPosition = gl.getAttribLocation(program, "aVertexPosition");
+  gl.enableVertexAttribArray(program.aVertexPosition);
+  gl.vertexAttribPointer(program.aVertexPosition, itemSize, gl.FLOAT, false, 0, 0);
+
+  //actually draw
+  gl.drawArrays(gl.LINES, 0, numItems);
+}
+
+//returns position[x,y] in gl coords (from -1 to 1 instead of 0 to canvas.width/height)
+//top left is 0,0
+function fromPixPosToGlCoord(pos){
+  // console.log('converting ', pos)
+  var x = 2 * pos[0] / getWidth() - 1;
+  var y = 0 - (2 * pos[1] / getHeight() - 1);
+  // console.log(x, y)
+  return [x,y];
+}
+
+//returns colorArr for webGL
+function fromRgbToGlCol(rgbArr) {
+  return rgbArr.map(function(color){
+    return color/255;
+  });
+}
