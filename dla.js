@@ -4,7 +4,8 @@ var numHits = 0;
 // var WALKER_COLOR = 'rgb(30,30,30)';
 var WALKER_COLOR = [20,20,20];
 var BR_COLOR = [0,0,0];
-var blobColor = [0,255,0];
+// var blobColor = [0,255,0];
+var blobColor = [0,0,0];
 var WALKER_WIDTH = 4;
 var blobWidth = 1;
 var blob_growth = .5;
@@ -34,7 +35,7 @@ function genSeeds(data){
 
 function resetState(){
   board = makeBoard(getWidth(), getHeight());
-  blobColor = [0,255,0];
+  if (color === 'rainbow') blobColor = [0,255,0];
   numHits = 0;
 }
 

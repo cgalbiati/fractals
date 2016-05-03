@@ -1,5 +1,7 @@
 'use strict';
 
+var digitRE = /d/;
+
 function lSysData(){
   return {
     truffula: {
@@ -64,6 +66,17 @@ function lSysData(){
   };
 }
 
+//flower: F=FFF+F--F+FFF+ angle:45, 
+//F=FG−FG++FG−FG, a=FG++FG++FG, 150
+//F++F++F++F-GG-F++F++F++F-GG-F++F++F++F
+
+
+//border F=F-F-F++F-F-F, F++F++F, 70
+//F++F++F++F++F++F, F=F--FF++FF--F, 85 - line-y
+//XYXYXYX+XYXYXYX+XYXYXYX+XYXYXYX, X=FX+FX+FXFY-FY-, Y=+FX+FXFY-FYFY+
+
+//tree: X=S[-FX]+FX, fx, 45, 10
+
 //currState: {
   //curPos: [x,y]
   //stack [x,y,color]
@@ -71,6 +84,7 @@ function lSysData(){
   //instr
   //dist
   //angle
+  //distMod
 //}
 
 function parseInstrIt(ctx, currState){
@@ -103,14 +117,18 @@ function parseInstrIt(ctx, currState){
       // console.log('-', 'newDir',newDir)
       return Object.assign({}, currState, {curDir: newDir}, {instr: newInstr});
     case '[':
-      newStack = currState.stack.concat({pos:currState.curPos, dir:currState.curDir});
+      newStack = currState.stack.concat({pos:currState.curPos, dir:currState.curDir, dist: currState.dist});
       // console.log('[', Object.assign({}, currState, {curDir: currState.curDir}, {stack: newStack}, {instr: newInstr}))
       return Object.assign({}, currState, {curDir: currState.curDir}, {stack: newStack}, {instr: newInstr});
     case ']':
       var oldPos = currState.stack[currState.stack.length-1];
       newStack = currState.stack.slice(0, currState.stack.length-1);
-      // console.log(']', Object.assign({}, currState, {curDir: oldPos.dir}, {curPos: oldPos.pos}, {stack: newStack}, {instr: newInstr}))
-      return Object.assign({}, currState, {curDir: oldPos.dir}, {curPos: oldPos.pos}, {stack: newStack}, {instr: newInstr});
+      return Object.assign({}, currState, {curDir: oldPos.dir}, {curPos: oldPos.pos}, {dist:oldPos.dist}, {stack: newStack}, {instr: newInstr});
+    case 'S':
+      var newDist = currState.dist * currState.distMod;
+      console.log('making new dist', newDist)
+      return Object.assign({}, currState, {dist: newDist}, {instr: newInstr});
+return Object.assign({}, currState, {curDir: oldPos.dir}, {curPos: oldPos.pos}, {stack: newStack}, {instr: newInstr});
     default: return Object.assign({}, currState, {instr: newInstr});
   }
   return Object.assign({}, currState, {instr: newInstr});
@@ -148,14 +166,18 @@ function parseInstrRecurse(ctx, currState){
       // console.log('-', 'newDir',newDir)
       if(newInstr.length && contDrawing) return window.requestAnimFrame(parseInstrRecurse.bind(null, ctx, Object.assign({}, currState, {curDir: newDir}, {instr: newInstr})));
     case '[':
-      newStack = currState.stack.concat({pos:currState.curPos, dir:currState.curDir});
+      newStack = currState.stack.concat({pos:currState.curPos, dir:currState.curDir, dist: currState.dist});
       // console.log('[', Object.assign({}, currState, {curDir: currState.curDir}, {stack: newStack}, {instr: newInstr}))
       if(newInstr.length && contDrawing) return window.requestAnimFrame(parseInstrRecurse.bind(null, ctx, Object.assign({}, currState, {curDir: currState.curDir}, {stack: newStack}, {instr: newInstr})));
     case ']':
       var oldPos = currState.stack[currState.stack.length-1];
       newStack = currState.stack.slice(0, currState.stack.length-1);
       // console.log(']', Object.assign({}, currState, {curDir: oldPos.dir}, {curPos: oldPos.pos}, {stack: newStack}, {instr: newInstr}))
-      if(newInstr.length && contDrawing) return window.requestAnimFrame(parseInstrRecurse.bind(null, ctx, Object.assign({}, currState, {curDir: oldPos.dir}, {curPos: oldPos.pos}, {stack: newStack}, {instr: newInstr})));
+      if(newInstr.length && contDrawing) return window.requestAnimFrame(parseInstrRecurse.bind(null, ctx, Object.assign({}, currState, {curDir: oldPos.dir}, {curPos: oldPos.pos}, {dist: oldPos.dist}, {stack: newStack}, {instr: newInstr})));
+    case 'S':
+      var newDist = currState.dist * currState.distMod;
+      // console.log('making new dist', newDist)
+      if(newInstr.length && contDrawing) return window.requestAnimFrame(parseInstrRecurse.bind(null, ctx, Object.assign({}, currState, {dist: newDist}, {instr: newInstr})));
     default: if(newInstr.length && contDrawing) return window.requestAnimFrame(parseInstrRecurse.bind(null, ctx, Object.assign({}, currState, {instr: newInstr})));
   }
   if(newInstr.length && contDrawing) return window.requestAnimFrame(parseInstrRecurse.bind(null, ctx, Object.assign({}, currState, {instr: newInstr})));
@@ -192,7 +214,8 @@ function drawLSys(ctx, data){
     curDir: data.startDir || 270, 
     instr: explodedInstr,
     dist: data.dist || 10,
-    angle: data.angle || 60
+    angle: data.angle || 60,
+    distMod: .7
   };
   console.log('watch', watchDraw)
   showRender('Rendering...');

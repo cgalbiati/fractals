@@ -36,8 +36,11 @@
 </head>
 <body>
   <h1 style="text-align:center;">Drawing Fractals!</h1>
-  <div style='float:left;margin:20pt;display:inline-block;margin-top:40pt;'>
+  <div style='float:left;margin:20pt;display:inline-block;margin-top:40pt;position:relative;'>
     <canvas id='canvas' style='background:black;'>
+      Sorry, your brower does not seem to support canvas :(
+    </canvas>
+    <canvas id='gl-canvas' style='background:black;position:absolute;top:0;left:0;display:none;'>
       Sorry, your brower does not seem to support canvas :(
     </canvas>
     <div> 
@@ -58,8 +61,20 @@
     <div style='float:left;'>
       <h3>Set Drawing</h3>
       <form id='drawing-opts' style='float:left;'>
-        <p>Fractal type:  <input type="radio" name="fractalType" value="lSystem" checked id='l-sys-select'> L-System <input type="radio" name="fractalType" value="dla" id='dla-select'> Diffusion Limited Aggregation<br></p>
+        <p>Fractal type:  <input type="radio" name="fractalType" value="lSystem" checked id='l-sys-select' class='l-sys-select'> L-System <input type="radio" name="fractalType" value="dla" id='dla-select' class='dla-select'> Diffusion Limited Aggregation<br></p>
         <p class='l-sys-only'>Axiom<input type="text" name="axiom" value='F-G-G'></p>
+        <div class='show-hint l-sys-only'>Meanings of symbols? (in axiom and rules)
+          <div class='hint'>
+            <p>F&G: move forward while drawing </p>
+             <p>f: move forward without drawing</p>
+             <p>-: turn right by angle</p>
+             <p>+: turn left by angle</p>
+             <p>[: push current state to stack</p>
+             <p>]: pop last saved state off stack and set as current state</p>
+             <p>S: shorten dist (* dist change amount)</p>
+             <p>* other characters can be used to substitute in rules, but won't affect drawing</p>
+          </div>
+        </div>
         <p class='l-sys-only'>Angle<input type="number" name="angle" value='120'></p>
         <p class='l-sys-only'>Iterations<input type="number" name="iterations" value='5'></p>
         <p class='l-sys-only'>Line Length<input type="number" name="dist" value='13'></p>
@@ -68,6 +83,8 @@
         <p class='l-sys-only'>Rule 1<input type="text" name="rule1" value='F=F-G+F+G-F'></p>
         <p class='l-sys-only'>Rule 2<input type="text" name="rule2" value='G=GG'></p>
         <p class='l-sys-only'>Rule 3<input type="text" name="rule3" value=''></p>
+        <p class='l-sys-only'>Change distance by (using S) (value between 0 and 1)<input type="text" name="distMod" value='0.7'></p>
+        <p>Blob color (R,G,B, or 'rainbow')<input type="text" name="color" value='rainbow'></p>
         <p>Change Board Size (width, height):<input type="number" name="canvasWidth" value='500' class='short-input'> <input type="number" name="canvasHeight" value='400' class='short-input'> </p>
         <p> <input type="checkbox" name="watchDraw" checked> Watch Drawing</p>
         <button id='start-drawing'type="button">Start Drawing</button>

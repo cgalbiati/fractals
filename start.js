@@ -1,6 +1,6 @@
 document.addEventListener("DOMContentLoaded", function(event) { 
-  // start(initCanvas);
-  start(initGl);
+  start(initCanvas);
+  // start(initGl);
   // canvas = document.getElementById('canvas');
   // initGl(canvas)
   // // drawLine(null, [0,100, 100, 100], [255, 100, 0]);
@@ -33,10 +33,10 @@ function start(initFn) {
     setTimeout(startDrawing.bind(window, ctx), 100);
   });
   document.getElementById('l-sys-select').addEventListener('click', function(){
-    [].forEach.call(inputs, (function(input){input.style.visibility='visible';}));
+    [].forEach.call(inputs, (function(input){input.style.display='block';}));
   });
   document.getElementById('dla-select').addEventListener('click', function(){
-    [].forEach.call(inputs, (function(input){input.style.visibility='hidden';}));
+    [].forEach.call(inputs, (function(input){input.style.display='none';}));
   });
   document.getElementById('l-sys-thumbnails').addEventListener('click', function(e){
     var thumbId = e.target.id;

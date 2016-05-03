@@ -1,3 +1,6 @@
+var color = 'rainbow';
+
+
 function populateForm(data){
   var form = document.getElementById('drawing-opts');
   form.axiom.value = data.axiom || 'F';
@@ -24,14 +27,23 @@ function parseForm(ctx){
   //set watchdraw to val of checkbox
   watchDraw = form.watchDraw.checked ? true : false;
 
+  //set color
+  color = form.color.value;
+  if (color !== 'rainbow') {
+    color = color.slice(',');
+    if (color.length !== 3 || !color.every(function(val){
+      return val>=0;
+    })) color = [0,0,0];
+    blobColor = color;
+  }
+
+
   //set canvas size
   canvasWidth = form.canvasWidth.value.length ? Number(form.canvasWidth.value) : 500;
   if (canvasWidth < 5 || canvasWidth > 2000) canvasWidth = 500;
   canvasHeight = form.canvasHeight.value.length ? Number(form.canvasHeight.value) : 500;
   if (canvasHeight < 5 || canvasHeight > 2000) canvasHeight = 400;
-  if (gl){
-    gl.viewport(0, 0, getWidth(), getHeight());
-  }
+
   canvas.width = canvasWidth;
   canvas.height = canvasHeight;
 
@@ -48,12 +60,15 @@ function parseForm(ctx){
     var dist = Number(form.dist.value) || getHeight()/29
     var startDir = Number(form.startDir.value) || 90;
     var iterations = Number(form.iterations.value) || 4;
+    var distMod = Number(form.distMod.value) || .7;
 
-    var data = {axiom, replace, startPos, angle, dist, startDir, iterations};
-    console.log(data)
+    var data = {axiom, replace, startPos, angle, dist, startDir, iterations, distMod};
+    // console.log(data)
     return drawLSys.bind(window, ctx, data);
   }
   else {
+    //if using canvas, switch to webgl
+    if(drawType !== 'webGL') gl = initGl(canvas);
     var data = 22;
     return drawDLA.bind(window, ctx, data);
   }

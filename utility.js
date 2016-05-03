@@ -59,6 +59,11 @@ function genLineFromAngle(curX, curY, dirAngle, dist){
 }
 
 function changeColor(){
+ if (color === 'rainbow') return rainbow();
+ else return blobColor;
+}
+
+function rainbow(){
   //incr blue if red is 0 and blue is less than max
   if(blobColor[2] < 254 && blobColor[0] === 0) blobColor[2]+=2;
   // decr green if blue is 255 and green is > 0
