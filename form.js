@@ -16,6 +16,16 @@ function populateForm(data){
   // form.rule1.value = data.rule1;
 }
 
+//colorStr is comma-sep rgb string
+function parseColor(colorStr, defaultArr){
+  var color = colorStr.split(',');
+  color = color.map(function(col){ return Number(col); });
+  if (color.length !== 3 || !color.every(function(val){
+    return Number(val)>=0;
+  })) color = defaultArr;
+  return color;
+}
+
 //parses form and returns bound fn
 function parseForm(ctx){
   var form = document.getElementById('drawing-opts');
@@ -29,25 +39,28 @@ function parseForm(ctx){
 
   //set color
   color = form.color.value;
-  if (color !== 'rainbow') {
-    color = color.slice(',');
-    if (color.length !== 3 || !color.every(function(val){
-      return val>=0;
-    })) color = [0,0,0];
-    blobColor = color;
-  }
-
+  console.log(color)
+  if (color !== 'rainbow') blobColor = parseColor(color, [255,0,0]);
+  var newBrCol = parseColor(form.brColor.value, [0,0,0]);
+  changeBackground(newBrCol, backgroundColor);
 
   //set canvas size
   canvasWidth = form.canvasWidth.value.length ? Number(form.canvasWidth.value) : 500;
-  if (canvasWidth < 5 || canvasWidth > 2000) canvasWidth = 500;
+  if (canvasWidth < 5 || canvasWidth > 3000) canvasWidth = 500;
   canvasHeight = form.canvasHeight.value.length ? Number(form.canvasHeight.value) : 500;
-  if (canvasHeight < 5 || canvasHeight > 2000) canvasHeight = 400;
+  if (canvasHeight < 5 || canvasHeight > 3000) canvasHeight = 400;
 
-  canvas.width = canvasWidth;
-  canvas.height = canvasHeight;
+  setCanvasSize();
 
   if(fractalType === 'lSystem'){
+
+    if(drawType !== 'canvas') {
+      drawType = 'canvas';
+      //init if not yet init-ed
+      initCanvas();
+      setView();
+    }
+
     var axiom = form.axiom.value.length ? form.axiom.value.split('') : ['F'];
     
     var replace = {};
@@ -68,7 +81,12 @@ function parseForm(ctx){
   }
   else {
     //if using canvas, switch to webgl
-    if(drawType !== 'webGL') gl = initGl(canvas);
+    if(drawType !== 'webGL') {
+      drawType = 'webGL';
+      //init if not yet init-ed
+      gl = initGl();
+      setView();
+    }
     var data = 22;
     return drawDLA.bind(window, ctx, data);
   }
@@ -82,3 +100,22 @@ function parseRule(ruleStr, rulesDict){
   var [key, val] = [rule[0], rule[1].split('')];
   return Object.assign({}, rulesDict, {[key]: val});
 }
+
+function changeBackground(newCol, oldCol){
+  if (newCol.length !== oldCol.length) return false;
+  for (var i = 0; i<newCol.length; i++){
+    if (newCol[i] !== oldCol[i]){
+      backgroundColor = newCol;
+      return setBackground(newCol);
+    } 
+  }
+}
+
+function setBackground(colArr){
+  if(drawType === 'webGL') {
+    colArr = fromRgbToGlCol(colArr);
+    gl.clearColor(colArr[0], colArr[1], colArr[2], 1.0);
+  }
+  else document.getElementById('canvas').style.backgroundColor=toRGB(colArr);
+}
+

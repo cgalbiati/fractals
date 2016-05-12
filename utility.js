@@ -5,8 +5,10 @@ var canvasWidth = 500;
 var contDrawing = true;
 var watchDraw = false;
 var canvas;
+var glCanvas;
 var ctx;
 var drawType;
+var backgroundColor = [0,0,0];
 
 
 function getWidth(){
@@ -14,16 +16,6 @@ function getWidth(){
 }
 function getHeight(){
   return canvasHeight ? canvasHeight : window.innerHeight;
-}
-
-function getColor(ctx, pos){
-  var flooredPos = [Math.floor(pos[0]), Math.floor(pos[1])];
-  return ctx.getImageData(flooredPos[0], flooredPos[1], 1, 1).data.slice(0,4);
-}
-
-function getColorArea(ctx, pos, size){
-  var flooredCorner = [Math.floor(pos[0]-size/2), Math.floor(pos[1]-size/2)];
-  return ctx.getImageData(flooredCorner[0], flooredCorner[1], size, size).data;
 }
 
 //transforms color arr to rgb/rgba str
@@ -59,6 +51,7 @@ function genLineFromAngle(curX, curY, dirAngle, dist){
 }
 
 function changeColor(){
+  console.log(color, blobColor, color === 'rainbow')
  if (color === 'rainbow') return rainbow();
  else return blobColor;
 }
@@ -91,25 +84,20 @@ window.requestAnimFrame = (function() {
 })();
 
 function startDrawing(ctx){
+  // setCanvasSize();
+  // setView();
   contDrawing = false;
-  console.log('set false')
   setTimeout( 
     window.requestAnimFrame(function(){
-      if(drawType === 'webGL') clearGL()
+      if(drawType === 'webGL') clearGL();
       else ctx.clearRect(0, 0, canvas.width, canvas.height);
       resetState();
       contDrawing = true;
-      console.log(' set true')
       var fractalFn = parseForm(ctx);
       fractalFn();
     }), 100
   ); 
 }
-
-
-
-// 
-
 
 function showRender(text){
   // console.log('starting');
@@ -161,19 +149,30 @@ function drawLine(ctx, [startX, startY, endX, endY], color, lineWidth){
 
 }
 
+function setCanvasSize(){
+  canvas.width = getWidth();
+  canvas.height = getHeight();
+  glCanvas.width = getWidth();
+  glCanvas.height = getHeight();
+}
 
-//set up listener on radio buttons
+function setView(){
+  if (drawType === 'webGL'){
+    glCanvas.style.display='inline-block';
+    // canvas.style.display = 'none';
+  }
+  else {
+    // canvas.style.display='inline-block';
+    glCanvas.style.display = 'none';
+  }
+}
 
-// function showLSysInputs(){
-//   document.getElementsByClass('l-sys').addAttribute('display:relative;')
-// }
-// function hideLSysInputs(){
-//   document.getElementsByClass('l-sys').addAttribute('display:none;')
-// }
+function getColor(ctx, pos){
+  var flooredPos = [Math.floor(pos[0]), Math.floor(pos[1])];
+  return ctx.getImageData(flooredPos[0], flooredPos[1], 1, 1).data.slice(0,4);
+}
 
-//resizing window erases any drawing
-// window.addEventListener('resize', function(e){
-//   var canvas = document.getElementById('canvas');
-//   canvas.width = window.innerWidth;
-//   canvas.height = window.innerHeight;
-// });
+function getColorArea(ctx, pos, size){
+  var flooredCorner = [Math.floor(pos[0]-size/2), Math.floor(pos[1]-size/2)];
+  return ctx.getImageData(flooredCorner[0], flooredCorner[1], size, size).data;
+}

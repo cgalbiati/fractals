@@ -27,6 +27,7 @@
   <link rel="stylesheet" href="styles.css">
   <script type="text/javascript" src='utility.js'></script>
   <script type="text/javascript" src='l-systems.js'></script>
+  <script type="text/javascript" src='l-sys-data.js'></script>
   <script type="text/javascript" src='dla.js'></script>
   <script type="text/javascript" src='form.js'></script>
   <script type="text/javascript" src='webGL.js'></script>
@@ -83,8 +84,10 @@
         <p class='l-sys-only'>Rule 1<input type="text" name="rule1" value='F=F-G+F+G-F'></p>
         <p class='l-sys-only'>Rule 2<input type="text" name="rule2" value='G=GG'></p>
         <p class='l-sys-only'>Rule 3<input type="text" name="rule3" value=''></p>
-        <p class='l-sys-only'>Change distance by (using S) (value between 0 and 1)<input type="text" name="distMod" value='0.7'></p>
+        <p class='l-sys-only'>"S" changes distance by (between 0 and 1)<input type="text" name="distMod" value='0.7'></p>
         <p>Blob color (R,G,B, or 'rainbow')<input type="text" name="color" value='rainbow'></p>
+        <!-- <p class='dla-only'>Walker color (R,G,B, or 'rainbow')<input type="text" name="walkerColor" value='30,30,30'></p> -->
+        <p>Background color (R,G,B)<input type="text" name="brColor" value='0,0,0'></p>
         <p>Change Board Size (width, height):<input type="number" name="canvasWidth" value='500' class='short-input'> <input type="number" name="canvasHeight" value='400' class='short-input'> </p>
         <p> <input type="checkbox" name="watchDraw" checked> Watch Drawing</p>
         <button id='start-drawing'type="button">Start Drawing</button>

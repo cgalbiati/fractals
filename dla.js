@@ -22,9 +22,10 @@ function plantSeeds(ctx, data){
     if(drawType === 'canvas'){
       ctx.beginPath();
       ctx.arc(seedPos[0], seedPos[1], 1, 0, 360);
-      ctx.fillStyle = color
+      ctx.fillStyle = color;
       ctx.fill();
     }
+    else drawLineGL(null, [seedPos[0]+1, seedPos[1], seedPos[0], seedPos[1]], blobColor);
     board[seedPos[0]][seedPos[1]] = 1;
   });
 }
@@ -118,13 +119,11 @@ function findColision(x, y, radius){
   return null;
 }
 
+//queries image data
 function walkRecurseSlow(ctx, oldPos, maxIterations, iteration, maxHits, runOpt){
-  // console.log('old', oldPos)
   var newPos = movePos(oldPos);
-  // console.log('newPos', newPos)
   //get land pixel
   var color = getColorArea(ctx, newPos, WALKER_WIDTH);
-  // console.log('color', color, newPos)
 
   // reliably tests if point is on blob
   // if((color[0]>WALKER_COL_ARR[0]+20 || color[1]>WALKER_COL_ARR[1]+20 || color[2]>WALKER_COL_ARR[2]+20) && color[3]>50) {
@@ -141,7 +140,6 @@ function walkRecurseSlow(ctx, oldPos, maxIterations, iteration, maxHits, runOpt)
     newPos = pickCorner(Math.floor(Math.random()*6), getWidth(), getHeight());
     // random respawn
     // newPos = [Math.floor(Math.random() * window.innerWidth), Math.floor(Math.random() * window.innerHeight) ]
-    // console.log('intersect', numHits, newPos, color)
   } else {
     //draw walker (only if no colision to aviod drawing over)
     if (watchDraw) drawLine(ctx, [oldPos[0], oldPos[1], newPos[0], newPos[1]], WALKER_COLOR, WALKER_WIDTH);
@@ -190,8 +188,10 @@ function movePos ([x,y]){
 
 
 function drawDLA(ctx, data){
+  clearGL();
   resetState();
   plantSeeds(ctx, data);
+
   //start walkers
   // startWalkers(ctx, walkIt, 1, 1000)
   startWalkers(ctx, walkRecurse, NUM_WALKERS, MAX_ITERATIONS, MAX_HITS);
@@ -240,7 +240,7 @@ function makeBoard(width, height){
   for (var i = 0; i < width; i++){
     dataArr.push([]);
     for (var j = 0; j < height; j++) {
-      dataArr[i].push(0)
+      dataArr[i].push(0);
     }
   }
   return dataArr;
@@ -248,38 +248,6 @@ function makeBoard(width, height){
 
 
 //start at edge - weight away from edge
-
-
-//seed
-//if intersect with seed's neighbor, draw line in neighbor direction
-//stroke weight - get thinner
-//stroke color **name values
-//line length
-
-//image generator - input image
-//black values - where image is
-//more likely to move back towards black area if farther away
-//only draw if in black area
-
-//Hyphal growth
-//seeds
-//grows in avg direction of all seeds near it
-//random splits
-
-//DLA 
-//seed
-//random walk (with something allpied (current))
-// grows whenever random walk hits neightbor of seed
-
-//L-systems 
-//start
-//input
-//itererator
-//rules
-//rules(itterator(input))
-
-//seed points
-//transormation
 
 
 // function walkIt(ctx, startPos, max){

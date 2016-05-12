@@ -1,0 +1,53 @@
+//upload rules
+//generate thumbnail and save all in db
+//save and share links
+
+//qs - find spec in db, load rules, draw
+
+//only show drawing - link to edit
+
+
+
+img
+
+//dowload
+save
+
+
+edit/build your own
+load someone else's
+
+db - name - unique?, keywords, creator
+
+
+
+//seed
+//if intersect with seed's neighbor, draw line in neighbor direction
+//stroke weight - get thinner
+//stroke color **name values
+//line length
+
+//image generator - input image
+//black values - where image is
+//more likely to move back towards black area if farther away
+//only draw if in black area
+
+//Hyphal growth
+//seeds
+//grows in avg direction of all seeds near it
+//random splits
+
+//DLA 
+//seed
+//random walk (with something applied (current))
+// grows whenever random walk hits neightbor of seed
+
+//L-systems 
+//start
+//input
+//itererator
+//rules
+//rules(itterator(input))
+
+//seed points
+//transormation

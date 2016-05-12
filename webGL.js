@@ -1,24 +1,16 @@
 var gl; // A global variable for the WebGL context
 
-function initGl(canvas){
-  canvas = document.getElementById("gl-canvas");
-  canvas.style.display='inline-block';
+function initGl(){
   try {
     // Try to grab the standard context. If it fails, fallback to experimental.
-    drawType = 'webGL';
-    gl = canvas.getContext("webgl", {preserveDrawingBuffer: true}) || canvas.getContext("experimental-webgl", {preserveDrawingBuffer: true});
-    console.log('gl???', gl)
+    gl = glCanvas.getContext("webgl", {preserveDrawingBuffer: true}) || glCanvas.getContext("experimental-webgl", {preserveDrawingBuffer: true});
   }
     catch(e) {
-      console.log('problem getting gl')
+      console.log('problem getting gl');
       drawType = 'canvas';
-      initCanvas(canvas);
+      setView();
+      initCanvas();
   }
-  //set canvas size
-  canvas.width = getWidth();
-  canvas.height = getHeight();
-  console.log('gl here', gl)
-  clearGL();
 
   //compile shaders
   var v = document.getElementById("vertex").firstChild.nodeValue;
@@ -46,15 +38,16 @@ function initGl(canvas){
    
   if (!gl.getProgramParameter(program, gl.LINK_STATUS))
     console.log(gl.getProgramInfoLog(program));
-  console.log('gl', gl)
+  
   return gl;
 }
 
 function clearGL(){
   //set viewport to entire canvas
   gl.viewport(0, 0, getWidth(), getHeight());
-  //set color to black, fully opaque
-  gl.clearColor(0, 0, 0, 1.0);
+  //set background
+  setBackground(backgroundColor);
+  // gl.clearColor(0, 0, 0, 1.0);
   gl.clear(gl.COLOR_BUFFER_BIT);
 }
 
